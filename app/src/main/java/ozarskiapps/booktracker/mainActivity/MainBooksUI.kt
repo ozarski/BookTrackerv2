@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ozarskiapps.booktracker.mockBookList
 
 @Composable
 fun LayoutMainBooks(){
@@ -36,15 +37,23 @@ fun LayoutMainBooks(){
         .background(Color.White)){
         Row(modifier = Modifier.fillMaxWidth()){
             Text(text = text.value,
-                modifier = Modifier.fillMaxWidth().padding(top = 5.dp).clickable { isOpen.value = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp, start = 10.dp)
+                    .clickable { isOpen.value = true },
                 fontSize = 20.sp,
-                textAlign = TextAlign.Center)
+                textAlign = TextAlign.Start)
         }
         Row(modifier = Modifier.fillMaxWidth()) {
-            DropdownTagList(list = listOf("Reading", "Finished", "Want to read"),
-                request = openCloseDropdown ,
+            val list = mutableListOf<String>()
+            for (i in 0..20) {
+                list.add("Tag $i")
+            }
+            DropdownTagList(list = list,
+                request = openCloseDropdown,
                 selectedString = userSelectedString,
                 requestToOpen = isOpen.value)
+            BookListLazyColumn(bookList = mockBookList())
         }
     }
 }
@@ -56,11 +65,14 @@ private fun DropdownTagList(
     request: (Boolean) -> Unit,
     selectedString: (String) -> Unit
 ){
-    DropdownMenu(expanded = requestToOpen, onDismissRequest = { request(false)}, modifier = Modifier.fillMaxWidth()) {
+    DropdownMenu(expanded = requestToOpen, onDismissRequest = { request(false) }, modifier = Modifier.fillMaxWidth()){
         list.forEach {
-            DropdownMenuItem(modifier = Modifier.fillMaxWidth(), onClick = {
+            DropdownMenuItem(modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Gray), onClick = {
                 selectedString(it)
                 request(false)
+                println("Selected: $it")
             }){
                 Text(it)
             }

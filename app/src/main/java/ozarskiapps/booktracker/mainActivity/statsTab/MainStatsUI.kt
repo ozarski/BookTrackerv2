@@ -1,4 +1,4 @@
-package ozarskiapps.booktracker.mainActivity
+package ozarskiapps.booktracker.mainActivity.statsTab
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,18 +18,13 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
-import ozarskiapps.booktracker.mainActivity.statsTab.StatsTabbedLayout
-
-@Composable
-fun LayoutMain(){
-    LayoutMainTabs()
-}
+import ozarskiapps.booktracker.mainActivity.LayoutMainBooks
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun LayoutMainTabs(){
+fun StatsTabbedLayout(){
     val tabIndex = remember { mutableStateOf(0) }
-    val tabs = listOf("Books", "Stats")
+    val tabs = listOf("Total", "Year", "Month")
 
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
@@ -44,7 +39,7 @@ fun LayoutMainTabs(){
             },
             backgroundColor = Color.White){
             tabs.forEachIndexed { index, title ->
-                Tab(text = { Text(title)},
+                Tab(text = { Text(title) },
                     selected = tabIndex.value == index,
                     onClick = {
                         scope.launch{
@@ -57,8 +52,9 @@ fun LayoutMainTabs(){
         }
         HorizontalPager(state = pagerState, count = tabs.size) {
             when(it){
-                0 -> LayoutMainBooks()
-                1 -> StatsTabbedLayout()
+                0 -> TotalStatsLayout()
+                1 -> YearStatsLayout()
+                2 -> MonthStatsLayout()
             }
         }
     }
