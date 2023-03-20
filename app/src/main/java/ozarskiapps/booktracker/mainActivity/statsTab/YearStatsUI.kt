@@ -91,8 +91,20 @@ fun NumberPickerPreview(){
             NumberPicker(context).apply {
                 setOnValueChangedListener { numberPicker, i, i2 ->  }
                 minValue = 0
-                maxValue = 50
-                wrapSelectorWheel = false
+                maxValue = 11
+                wrapSelectorWheel = true
+                displayedValues = arrayOf("January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December")
             }
         }
     )
