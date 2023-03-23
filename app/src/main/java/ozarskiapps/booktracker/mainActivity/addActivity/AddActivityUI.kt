@@ -1,7 +1,6 @@
 package ozarskiapps.booktracker.mainActivity.addActivity
 
 import android.content.Context
-import android.widget.NumberPicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -16,7 +15,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import java.util.*
 
 @Composable
@@ -31,6 +29,8 @@ fun BookAddActivityLayout(title: MutableState<TextFieldValue>,
                           endMonth: MutableState<Int>,
                           endYear: MutableState<Int>){
 
+    val selectedOption = remember { mutableStateOf("Reading") }
+
     Column(modifier = Modifier
         .background(Color.White)
         .padding(top = 10.dp)
@@ -43,17 +43,28 @@ fun BookAddActivityLayout(title: MutableState<TextFieldValue>,
             TextFieldRow(placeholder = "Book title", label = "Title", text = title)
             TextFieldRow(placeholder = "Book author", label = "Author", text = author)
             NumberTextFieldRow(placeholder = "Number of pages", label = "Number of pages", text = numberOfPages)
-            StatusRadioButtons()
-            Text(text = "Start date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
-            StartDatePicker(context = context, month = startMonth, day = startDay, year = startYear)
-            Text(text = "End date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
-            EndDatePicker(context = context, month = endMonth, day = endDay, year = endYear)
+            StatusRadioButtons(selectedOption.value){ option -> selectedOption.value = option }
+            val startSelectedDate = remember{ mutableStateOf(Calendar.getInstance()) }
+            val endSelectedDate = remember{ mutableStateOf(Calendar.getInstance()) }
+            if(selectedOption.value == "Finished"){
+
+                Text(text = "Start date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
+                JetpackDatePicker(selectedDate = startSelectedDate)
+                Text(text = "End date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
+                JetpackDatePicker(selectedDate = endSelectedDate)
+            }
+            else if(selectedOption.value == "Reading"){
+
+                Text(text = "Start date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
+                JetpackDatePicker(selectedDate = startSelectedDate)
+            }
         }
         AddButton()
     }
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextFieldRow(placeholder: String, label: String, text: MutableState<TextFieldValue>){
     Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()){
@@ -75,6 +86,7 @@ fun TextFieldRow(placeholder: String, label: String, text: MutableState<TextFiel
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumberTextFieldRow(placeholder: String, label: String, text: MutableState<TextFieldValue>){
     Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()){
@@ -97,12 +109,10 @@ fun NumberTextFieldRow(placeholder: String, label: String, text: MutableState<Te
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatusRadioButtons() {
-    val radioOptions = listOf("Reading", "Finished ", "Want to read")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
-    val option = remember { mutableStateOf(radioOptions[0]) }
+fun StatusRadioButtons(selectedOption: String, onOptionSelected: (String) -> Unit) {
+    val radioOptions = listOf("Reading", "Finished", "Want to read")
+    //val option = remember { mutableStateOf(radioOptions[0]) }
     Row (horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()){
         // below line is use to set data to
         // each radio button in columns.
@@ -146,98 +156,7 @@ fun StatusRadioButton(text: String,
     }
 }
 
-@Composable
-fun CreateNumberPicker(context: Context,
-                       changedValue: MutableState<Int>,
-                       minVal: Int,
-                       maxVal: MutableState<Int>){
-    AndroidView(
-        factory = { context ->
-            NumberPicker(context).apply {
-                setOnValueChangedListener { numberPicker, i, i2 ->  changedValue.value = i2}
-                minValue = minVal
-                maxValue = maxVal.value
-                wrapSelectorWheel = true
-            }
-        }
-    )
-}
 
-@Composable
-fun CustomNumberPicker(context: Context, 
-                       changedValue: MutableState<Int>,
-                       minVal: Int,
-                       maxVal: Int,
-                       displayedValues: Array<String>){
-    AndroidView(
-        factory = { context ->
-            NumberPicker(context).apply {
-                setOnValueChangedListener { numberPicker, i, i2 ->  changedValue.value = i2}
-                minValue = minVal
-                maxValue = maxVal
-                wrapSelectorWheel = true
-                this.displayedValues = displayedValues
-            }
-        }
-    )
-}
-
-@Composable
-fun MonthNumberPicker(context: Context, month: MutableState<Int>){
-    val displayedValues = arrayOf("January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December")
-    CustomNumberPicker(context = context, changedValue = month, minVal = 0, maxVal = 11, displayedValues = displayedValues)
-}
-
-@Composable
-fun DayOfMonthNumberPicker(context: Context, month: MutableState<Int>, day: MutableState<Int>){
-    val maxVal = remember {mutableStateOf(
-            when(month.value){
-                0, 2, 4, 6, 7, 9, 11 -> 31
-                1 -> 28
-                else -> 30
-            }
-        )
-    }
-    CreateNumberPicker(context = context, changedValue = day, minVal = 1, maxVal = maxVal)
-}
-
-@Composable
-fun YearNumberPicker(context: Context, year: MutableState<Int>){
-    CreateNumberPicker(context = context, changedValue = year, minVal = 1900, maxVal = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) })
-}
-
-@Composable
-fun StartDatePicker(context: Context, month: MutableState<Int>, day: MutableState<Int>, year: MutableState<Int>){
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 10.dp)){
-        DayOfMonthNumberPicker(context, month, day)
-        MonthNumberPicker(context, month)
-        YearNumberPicker(context, year)
-    }
-}
-
-@Composable
-fun EndDatePicker(context: Context, month: MutableState<Int>, day: MutableState<Int>, year: MutableState<Int>){
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 10.dp)){
-        DayOfMonthNumberPicker(context, month, day)
-        MonthNumberPicker(context, month)
-        YearNumberPicker(context, year)
-    }
-}
 
 @Composable
 fun AddButton(){
