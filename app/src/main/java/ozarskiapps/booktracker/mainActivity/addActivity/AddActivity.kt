@@ -28,11 +28,7 @@ private fun AddLayout(context: Context){
     val bookTitle = remember { mutableStateOf(TextFieldValue("")) }
     val bookAuthor = remember { mutableStateOf(TextFieldValue("")) }
     val bookNumberOfPages = remember { mutableStateOf(TextFieldValue("")) }
-    val startDay = remember { mutableStateOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) }
-    val startMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH)) }
-    val startYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
-    val endDay = remember { mutableStateOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) }
-    val endMonth = remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH)) }
-    val endYear = remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
-    BookAddActivityLayout(title = bookTitle, author = bookAuthor, numberOfPages = bookNumberOfPages, context, startDay, startMonth, startYear, endDay, endMonth, endYear)
+    val startDate = remember { mutableStateOf(Calendar.getInstance()) }
+    val endDate = remember { mutableStateOf(Calendar.getInstance()) }
+    BookAddActivityLayout(title = bookTitle, author = bookAuthor, numberOfPages = bookNumberOfPages, startDate = startDate, endDate = endDate)
 }
