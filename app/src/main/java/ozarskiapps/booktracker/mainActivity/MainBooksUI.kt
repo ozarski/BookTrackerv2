@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ozarskiapps.booktracker.mockBookList
 
 @Composable
 fun LayoutMainBooks(){
@@ -53,7 +52,7 @@ fun LayoutMainBooks(){
                 request = openCloseDropdown,
                 selectedString = userSelectedString,
                 requestToOpen = isOpen.value)
-            BookListLazyColumn(bookList = mockBookList())
+            BookListLazyColumn(bookList = mutableListOf())
         }
     }
 }

@@ -1,4 +1,4 @@
-package ozarskiapps.booktracker.mainActivity.addActivity
+package ozarskiapps.booktracker.addActivity
 
 import android.widget.NumberPicker
 import androidx.compose.foundation.layout.Arrangement

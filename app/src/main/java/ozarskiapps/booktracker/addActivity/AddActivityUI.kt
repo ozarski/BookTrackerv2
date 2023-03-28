@@ -1,4 +1,4 @@
-package ozarskiapps.booktracker.mainActivity.addActivity
+package ozarskiapps.booktracker.addActivity
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
