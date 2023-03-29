@@ -1,0 +1,600 @@
+package ozarskiapps.booktracker
+
+import android.content.Context
+import androidx.test.platform.app.InstrumentationRegistry
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import ozarskiapps.booktracker.book.Book
+import ozarskiapps.booktracker.book.BookStatus
+import ozarskiapps.booktracker.database.BookDBService
+import ozarskiapps.booktracker.database.DatabaseConstants
+import ozarskiapps.booktracker.database.ReadingTimeDBService
+import java.util.*
+
+class ReadingTimeTests {
+
+    private lateinit var bookDBService: BookDBService
+    private lateinit var readingTimeService: ReadingTimeDBService
+    private lateinit var appContext: Context
+
+    @Before
+    fun setUp() {
+        appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        bookDBService = BookDBService(appContext)
+        readingTimeService = ReadingTimeDBService(appContext)
+    }
+
+    @After
+    fun tearDown() {
+        bookDBService.close()
+        readingTimeService.close()
+        appContext.deleteDatabase(DatabaseConstants.DATABASE_NAME)
+    }
+
+    @Test
+    fun testReadingTimeTableCreation(){
+        val cursor = readingTimeService.readableDatabase.rawQuery(
+            "SELECT name " +
+                    "FROM sqlite_master WHERE type='table' AND name='${DatabaseConstants.ReadingTimeTable.TABLE_NAME}'",
+            null
+        )
+        cursor.use {
+            assertTrue(cursor.moveToFirst())
+            assertEquals(DatabaseConstants.ReadingTimeTable.TABLE_NAME, cursor.getString(0))
+        }
+    }
+
+    @Test
+    fun booksReadInNotOverlappingOrAdjacentTimePeriods() {
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(2, readingTime)
+    }
+
+    @Test
+    fun booksReadTimeInNotOverlappingAdjacentTimePeriods() {
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(2, readingTime)
+    }
+
+    @Test
+    fun bookReadInPartiallyOverlappingTimePeriods() {
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(4, readingTime)
+    }
+
+    @Test
+    fun bookReadInExactlyTheSameTimePeriod(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun bookReadingTimeCoversWholeReadingTimeOfAnotherBook(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun threeBooksReadInPartiallyOverlappingTimePeriods(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun threeBookReadInExactlyTheSameTimePeriod(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun book1ReadInThePeriodCoveringOverlappingReadingTimeOfBook2AndBook3(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun book1ReadInTimePeriodCoveringNotOverlappingReadingTimeOfBook2AndBook3(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun book1ReadInTimePeriodCoveringReadingTimeOfBook2CoveringReadingTimeOfBook3(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val readingTime = readingTimeService.getTotalReadingTime()
+        assertEquals(5, readingTime)
+    }
+
+    @Test
+    fun bookReadingTimeAutomaticallyAddedToDatabase(){
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        bookDBService.addBook(book)
+
+        val db = readingTimeService.readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(${DatabaseConstants.ReadingTimeTable.DATE_COLUMN}) FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
+        val count = cursor.count
+
+        assertEquals(5, count)
+    }
+
+    @Test
+    fun bookReadingTimeAutomaticallyUpdatedOnBookUpdate(){
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        book.id = bookDBService.addBook(book)
+        book.startDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+
+        bookDBService.updateBook(book)
+
+        val db = readingTimeService.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
+        val count = cursor.count
+
+        assertEquals(4, count)
+    }
+
+    @Test
+    fun bookReadingTimeAutomaticallyDeletedOnBookDelete(){
+        val db = readingTimeService.readableDatabase
+
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        book.id = bookDBService.addBook(book)
+        val cursorAfterAdd = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
+        val countAfterAdd = cursorAfterAdd.count
+
+        bookDBService.deleteBookByID(book.id)
+
+        val cursor = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
+        val count = cursor.count
+
+        assertTrue(countAfterAdd > count)
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun readingTimeInCustomTimePeriodFor2Books(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val startDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        val endDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+
+        val readingTime = readingTimeService.getTotalReadingTimeForTimePeriod(startDate, endDate)
+        assertEquals(3, readingTime)
+    }
+
+    @Test
+    fun readingTimeInCustomTimePeriodFor3Books(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) },
+            Calendar.getInstance()
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val startDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        val endDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+
+        val readingTime = readingTimeService.getTotalReadingTimeForTimePeriod(startDate, endDate)
+        assertEquals(4, readingTime)
+    }
+}

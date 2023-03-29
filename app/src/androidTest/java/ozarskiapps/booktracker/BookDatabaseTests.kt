@@ -16,7 +16,7 @@ import ozarskiapps.booktracker.database.DatabaseConstants
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class DatabaseTests {
+class BookDatabaseTests {
 
     private lateinit var bookDBService: BookDBService
     private lateinit var appContext: Context
@@ -156,6 +156,12 @@ class DatabaseTests {
         assertEquals(book.bookStatus, bookFromDB?.bookStatus)
         assertEquals(book.startDate.timeInMillis, bookFromDB?.startDate?.timeInMillis)
         assertEquals(book.endDate.timeInMillis, bookFromDB?.endDate?.timeInMillis)
+    }
+
+    @Test
+    fun testGetNonexistentBookByID(){
+        val bookFromDB = bookDBService.getBookByID(1)
+        assertNull(bookFromDB)
     }
 
 }
