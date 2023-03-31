@@ -71,18 +71,39 @@ class BookDatabaseTests {
         )
         cursor.use {
             assertTrue(cursor.moveToFirst())
-            assertEquals(book.title, cursor.getString(1))
-            assertEquals(book.author, cursor.getString(2))
-            assertEquals(book.numberOfPages, cursor.getInt(3))
-            assertEquals(book.currentProgress, cursor.getInt(4))
-            assertEquals(book.bookStatus.toString(), cursor.getString(5))
-            assertEquals(book.startDate.timeInMillis, cursor.getLong(6))
-            assertEquals(book.endDate.timeInMillis, cursor.getLong(7))
+            assertEquals(
+                book.title,
+                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
+            )
+            assertEquals(
+                book.author,
+                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
+            )
+            assertEquals(
+                book.numberOfPages,
+                cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
+            )
+            assertEquals(
+                book.currentProgress,
+                cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+            )
+            assertEquals(
+                book.bookStatus.toString(),
+                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN))
+            )
+            assertEquals(
+                book.startDate.timeInMillis,
+                cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
+            )
+            assertEquals(
+                book.endDate.timeInMillis,
+                cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
+            )
         }
     }
 
     @Test
-    fun testModifyingBook(){
+    fun testModifyingBook() {
         val book = Book(
             "Full book title",
             "Author name",
@@ -114,7 +135,7 @@ class BookDatabaseTests {
     }
 
     @Test
-    fun testDeletingBook(){
+    fun testDeletingBook() {
         val book = Book(
             "Full book title",
             "Author name",
@@ -136,7 +157,7 @@ class BookDatabaseTests {
     }
 
     @Test
-    fun testGettingBookByID(){
+    fun testGettingBookByID() {
         val book = Book(
             "Full book title",
             "Author name",
@@ -159,7 +180,7 @@ class BookDatabaseTests {
     }
 
     @Test
-    fun testGetNonexistentBookByID(){
+    fun testGetNonexistentBookByID() {
         val bookFromDB = bookDBService.getBookByID(1)
         assertNull(bookFromDB)
     }

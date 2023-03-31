@@ -35,6 +35,39 @@ class ReadingTimeTests {
     }
 
     @Test
+    fun readingTimeDataInsertTest(){
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        bookDBService.addBook(book)
+
+        val cursor = readingTimeService.readableDatabase.rawQuery(
+            "SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}",
+            null
+        )
+
+        with(cursor){
+            assertTrue(moveToFirst())
+            while(moveToNext()){
+                val id = getLong(getColumnIndexOrThrow(DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN))
+                val date = getLong(getColumnIndexOrThrow(DatabaseConstants.ReadingTimeTable.DATE_COLUMN))
+                assertEquals(book.id, id)
+                assertTrue(book.startDate.timeInMillis <= date)
+                assertTrue(book.endDate.timeInMillis >= date)
+            }
+        }
+    }
+
+    @Test
     fun testReadingTimeTableCreation(){
         val cursor = readingTimeService.readableDatabase.rawQuery(
             "SELECT name " +
@@ -45,6 +78,194 @@ class ReadingTimeTests {
             assertTrue(cursor.moveToFirst())
             assertEquals(DatabaseConstants.ReadingTimeTable.TABLE_NAME, cursor.getString(0))
         }
+    }
+
+    @Test
+    fun singleBookReadingTimeAutomaticallyAddedToDatabase(){
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        bookDBService.addBook(book)
+
+        val count = getReadingTimeTableRowCount()
+
+        assertEquals(5, count)
+    }
+
+    @Test
+    fun twoOverlappingBooksReadingTimeAutomaticallyAddedToDatabase(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val count = getReadingTimeTableRowCount()
+
+        assertEquals(6, count)
+    }
+
+    @Test
+    fun singleBookReadingTimeAutomaticallyUpdatedOnBookUpdate(){
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        book.id = bookDBService.addBook(book)
+        book.startDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+
+        bookDBService.updateBook(book)
+
+        val count = getReadingTimeTableRowCount()
+
+        assertEquals(4, count)
+    }
+
+    @Test
+    fun twoOverlappingBooksReadingTimeAutomaticallyUpdated(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        book1.id = bookDBService.addBook(book1)
+        book2.id = bookDBService.addBook(book2)
+
+        val countAfterAdd = getReadingTimeTableRowCount()
+        assertEquals(6, countAfterAdd)
+
+
+        book1.startDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+
+        bookDBService.updateBook(book1)
+
+        val count = getReadingTimeTableRowCount()
+
+        assertEquals(5, count)
+    }
+
+    @Test
+    fun singleBookReadingTimeAutomaticallyDeletedOnBookDelete(){
+        val book = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        book.id = bookDBService.addBook(book)
+        val countAfterAdd = getReadingTimeTableRowCount()
+        assertEquals(5, countAfterAdd)
+
+        bookDBService.deleteBookByID(book.id)
+
+        val count = getReadingTimeTableRowCount()
+
+        assertTrue(countAfterAdd > count)
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun twoOverlappingBooksReadingTimeAutomaticallyDeletedOnBookDelete(){
+        val db = readingTimeService.readableDatabase
+
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+
+        val countAfterAdd = getReadingTimeTableRowCount()
+        assertEquals(6, countAfterAdd)
+
+        bookDBService.deleteBookByID(book1.id)
+
+        val count = getReadingTimeTableRowCount()
+
+        assertTrue(countAfterAdd > count)
+        assertEquals(3, count)
     }
 
     @Test
@@ -435,84 +656,6 @@ class ReadingTimeTests {
         assertEquals(5, readingTime)
     }
 
-    @Test
-    fun bookReadingTimeAutomaticallyAddedToDatabase(){
-        val book = Book(
-            "Full book title 1",
-            "Author name 1",
-            42,
-            0,
-            BookStatus.Finished,
-            Calendar.getInstance()
-                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
-            Calendar.getInstance()
-                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
-        )
-
-        bookDBService.addBook(book)
-
-        val db = readingTimeService.readableDatabase
-        val cursor = db.rawQuery("SELECT COUNT(${DatabaseConstants.ReadingTimeTable.DATE_COLUMN}) FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
-        val count = cursor.count
-
-        assertEquals(5, count)
-    }
-
-    @Test
-    fun bookReadingTimeAutomaticallyUpdatedOnBookUpdate(){
-        val book = Book(
-            "Full book title 1",
-            "Author name 1",
-            42,
-            0,
-            BookStatus.Finished,
-            Calendar.getInstance()
-                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
-            Calendar.getInstance()
-                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
-        )
-
-        book.id = bookDBService.addBook(book)
-        book.startDate = Calendar.getInstance()
-            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
-
-        bookDBService.updateBook(book)
-
-        val db = readingTimeService.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
-        val count = cursor.count
-
-        assertEquals(4, count)
-    }
-
-    @Test
-    fun bookReadingTimeAutomaticallyDeletedOnBookDelete(){
-        val db = readingTimeService.readableDatabase
-
-        val book = Book(
-            "Full book title 1",
-            "Author name 1",
-            42,
-            0,
-            BookStatus.Finished,
-            Calendar.getInstance()
-                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
-            Calendar.getInstance()
-                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
-        )
-
-        book.id = bookDBService.addBook(book)
-        val cursorAfterAdd = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
-        val countAfterAdd = cursorAfterAdd.count
-
-        bookDBService.deleteBookByID(book.id)
-
-        val cursor = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
-        val count = cursor.count
-
-        assertTrue(countAfterAdd > count)
-        assertEquals(0, count)
-    }
 
     @Test
     fun readingTimeInCustomTimePeriodFor2Books(){
@@ -596,5 +739,13 @@ class ReadingTimeTests {
 
         val readingTime = readingTimeService.getTotalReadingTimeForTimePeriod(startDate, endDate)
         assertEquals(4, readingTime)
+    }
+
+    private fun getReadingTimeTableRowCount(): Int{
+        val db = readingTimeService.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM ${DatabaseConstants.ReadingTimeTable.TABLE_NAME}", null)
+        val count = cursor.count
+        cursor.close()
+        return count
     }
 }

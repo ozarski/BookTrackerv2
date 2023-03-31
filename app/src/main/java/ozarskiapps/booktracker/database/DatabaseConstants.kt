@@ -18,7 +18,7 @@ object DatabaseConstants{
             "${BookTable.END_DATE_COLUMN} LONG)"
 
     const val READING_TIME_TABLE_CREATE_QUERY = "CREATE TABLE ${ReadingTimeTable.TABLE_NAME} (" +
-            "${ReadingTimeTable.BOOK_IDS_COLUMN} TEXT NOT NULL," +
+            "${ReadingTimeTable.BOOK_ID_COLUMN} TEXT NOT NULL," +
             "${ReadingTimeTable.DATE_COLUMN} LONG NOT NULL)"
 
     object BookTable: BaseColumns {
@@ -34,7 +34,7 @@ object DatabaseConstants{
 
     object ReadingTimeTable: BaseColumns{
         const val TABLE_NAME = "reading_time"
-        const val BOOK_IDS_COLUMN = "book_ids"
+        const val BOOK_ID_COLUMN = "book_id"
         const val DATE_COLUMN = "date"
     }
 }

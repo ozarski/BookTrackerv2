@@ -7,7 +7,7 @@ import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import java.util.*
 
-class BookDBService(context: Context) : DBService(context) {
+class BookDBService(val context: Context) : DBService(context) {
 
     fun addBook(book: Book): Long {
         val db = this.writableDatabase
@@ -22,7 +22,10 @@ class BookDBService(context: Context) : DBService(context) {
             put(DatabaseConstants.BookTable.END_DATE_COLUMN, book.endDate.timeInMillis)
         }
 
-        return db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues)
+        val id =  db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues)
+        book.id = id
+        ReadingTimeDBService(context).addBookReadingTime(book)
+        return id
     }
 
     fun getBookByID(id: Long): Book? {
@@ -105,6 +108,7 @@ class BookDBService(context: Context) : DBService(context) {
         val selectionArgs = arrayOf(book.id.toString())
 
         db.update(DatabaseConstants.BookTable.TABLE_NAME, contentValues, selection, selectionArgs)
+        ReadingTimeDBService(context).updateBookReadingTime(book)
     }
 
     fun deleteBookByID(id: Long){
@@ -114,5 +118,6 @@ class BookDBService(context: Context) : DBService(context) {
         val selectionArgs = arrayOf(id.toString())
 
         db.delete(DatabaseConstants.BookTable.TABLE_NAME, selection, selectionArgs)
+        ReadingTimeDBService(context).deleteBookReadingTimeByBookID(id)
     }
 }
