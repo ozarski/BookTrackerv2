@@ -4,18 +4,64 @@ import android.content.ContentValues
 import android.content.Context
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.readingTime.ReadingDay
+import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
 class ReadingTimeDBService(context: Context) : DBService(context) {
 
-    fun getDaysByBookID(id: Long): List<ReadingDay> {
-        //TODO("Not implemented yet")
-        return mutableListOf()
+
+    fun getNumberOfBooksReadInTimePeriod(start: Calendar, end: Calendar): Int {
+        val db = this.readableDatabase
+        val startCal = setCalendar(start)
+        val endCal = setCalendar(end, false)
+        val result = "numberOfBooks"
+        val projection =
+            arrayOf("COUNT(DISTINCT ${DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN}) as $result")
+        val selection = "${DatabaseConstants.ReadingTimeTable.DATE_COLUMN} BETWEEN ? AND ?"
+        val selectionArgs =
+            arrayOf(startCal.timeInMillis.toString(), endCal.timeInMillis.toString())
+        val cursor = db.query(
+            DatabaseConstants.ReadingTimeTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+        with(cursor) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(getColumnIndexOrThrow(result))
+            }
+        }
+        return 0
     }
 
-    fun getBookIDsForTimePeriod(start: Calendar, end: Calendar): List<Long> {
-        //TODO("Not implemented yet")
-        return mutableListOf()
+    fun getBookIdsReadInTimePeriod(start: Calendar, end: Calendar): List<Long> {
+        val db = this.readableDatabase
+        val startCal = setCalendar(start)
+        val endCal = setCalendar(end, false)
+        val result = "bookID"
+        val projection = arrayOf("DISTINCT ${DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN} as $result")
+        val selection = "${DatabaseConstants.ReadingTimeTable.DATE_COLUMN} BETWEEN ? AND ?"
+        val selectionArgs =
+            arrayOf(startCal.timeInMillis.toString(), endCal.timeInMillis.toString())
+        val cursor = db.query(
+            DatabaseConstants.ReadingTimeTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+        val bookIds = mutableListOf<Long>()
+        with(cursor) {
+            while (moveToNext()) {
+                bookIds.add(getLong(getColumnIndexOrThrow(result)))
+            }
+        }
+        return bookIds
     }
 
     fun addBookReadingTime(book: Book) {
@@ -43,13 +89,53 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
     }
 
     fun getTotalReadingTime(): Int {
-        //TODO("Not implemented yet")
-        return -1
+        val db = this.readableDatabase
+        val result = "numberOfDays"
+        val projection =
+            arrayOf("COUNT(DISTINCT ${DatabaseConstants.ReadingTimeTable.DATE_COLUMN}) as $result")
+        val cursor = db.query(
+            DatabaseConstants.ReadingTimeTable.TABLE_NAME,
+            projection,
+            null,
+            null,
+            null,
+            null,
+            null
+        )
+        with(cursor) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(getColumnIndexOrThrow(result))
+            }
+        }
+        return 0
     }
 
     fun getTotalReadingTimeForTimePeriod(start: Calendar, end: Calendar): Int {
-        //TODO("Not implemented yet")
-        return -1
+        val db = this.readableDatabase
+        val startCal = setCalendar(start)
+        val endCal = setCalendar(end, false)
+        val result = "numberOfDays"
+        val projection =
+            arrayOf("COUNT(DISTINCT ${DatabaseConstants.ReadingTimeTable.DATE_COLUMN}) as $result")
+        val selection = "${DatabaseConstants.ReadingTimeTable.DATE_COLUMN} BETWEEN ? AND ?"
+        val selectionArgs =
+            arrayOf(startCal.timeInMillis.toString(), endCal.timeInMillis.toString())
+
+        val cursor = db.query(
+            DatabaseConstants.ReadingTimeTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+        with(cursor) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(getColumnIndexOrThrow(result))
+            }
+        }
+        return 0
     }
 
     private fun getReadingDaysForBook(book: Book): List<ReadingDay> {

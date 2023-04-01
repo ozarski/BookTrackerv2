@@ -292,6 +292,9 @@ class ReadingTimeTests {
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) }
         )
 
+        println(book1.startDate.time)
+        println(book2.startDate.time)
+
         bookDBService.addBook(book1)
         bookDBService.addBook(book2)
 
@@ -739,6 +742,102 @@ class ReadingTimeTests {
 
         val readingTime = readingTimeService.getTotalReadingTimeForTimePeriod(startDate, endDate)
         assertEquals(4, readingTime)
+    }
+
+    @Test
+    fun testNumberOfBooksReadInTimePeriod(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+
+        val startDate = Calendar.getInstance()
+        val endDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+
+        val numberOfBooksRead = readingTimeService.getNumberOfBooksReadInTimePeriod(startDate, endDate)
+        assertEquals(2, numberOfBooksRead)
+    }
+
+    @Test
+    fun getBookIDsForBooksReadInTimePeriod(){
+        val book1 = Book(
+            "Full book title 1",
+            "Author name 1",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+        )
+
+        val book2 = Book(
+            "Full book title 2",
+            "Author name 2",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
+            Calendar.getInstance()
+        )
+
+        val book3 = Book(
+            "Full book title 3",
+            "Author name 3",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
+            Calendar.getInstance()
+                .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) }
+        )
+
+        book1.id = bookDBService.addBook(book1)
+        book2.id = bookDBService.addBook(book2)
+        book3.id = bookDBService.addBook(book3)
+
+        val startDate = Calendar.getInstance()
+        val endDate = Calendar.getInstance()
+            .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 2) }
+
+        val numberOfBooksRead = readingTimeService.getBookIdsReadInTimePeriod(startDate, endDate)
+        assertEquals(listOf(book1.id, book2.id), numberOfBooksRead)
     }
 
     private fun getReadingTimeTableRowCount(): Int{
