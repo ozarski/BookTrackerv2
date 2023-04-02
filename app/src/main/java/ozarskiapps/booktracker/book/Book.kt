@@ -32,6 +32,16 @@ class Book(
         -1
     )
 
+    fun getBookReadingTimeInDays(): Int{
+        return if(bookStatus == BookStatus.Finished){
+            val startDate = setCalendar(this.startDate)
+            val endDate = setCalendar(this.endDate, false)
+            ((endDate.timeInMillis - startDate.timeInMillis) / (24 * 60 * 60 * 1000)).toInt() + 1
+        } else{
+            -1
+        }
+    }
+
     override fun toString(): String {
         return "Title: $title \t" +
                 "Author: $author\t" +
