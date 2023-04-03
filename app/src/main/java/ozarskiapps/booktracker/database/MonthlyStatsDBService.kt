@@ -1,10 +1,9 @@
 package ozarskiapps.booktracker.database
 
 import android.content.Context
-import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
-class YearlyStatsDBService(val context: Context, year: Calendar): DBService(context) {
+class MonthlyStatsDBService(val context: Context, month: Calendar): DBService(context) {
 
     fun getTotalNumberOfPages(): Long {
         //TODO("Not implemented yet")
@@ -31,19 +30,9 @@ class YearlyStatsDBService(val context: Context, year: Calendar): DBService(cont
         return -1.0
     }
 
-    fun getAverageBooksPerMonth(): Double {
-        //TODO("Not implemented yet")
-        return -1.0
-    }
-
     fun getAverageBooksPerWeek(): Double {
         //TODO("Not implemented yet")
         return -1.0
-    }
-
-    fun getMonthWithMostBooksRead(): String {
-        //TODO("Not implemented yet")
-        return ""
     }
 
     fun getCalendarMonthStart(calendar: Calendar): Calendar {
@@ -67,5 +56,6 @@ class YearlyStatsDBService(val context: Context, year: Calendar): DBService(cont
         cal.set(Calendar.SECOND, 59)
         return cal
     }
+
 
 }

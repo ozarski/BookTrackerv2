@@ -10,7 +10,6 @@ import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.database.BookDBService
 import ozarskiapps.booktracker.database.DatabaseConstants
-import ozarskiapps.booktracker.database.GlobalStatsDBService
 import ozarskiapps.booktracker.database.YearlyStatsDBService
 import java.util.*
 
@@ -24,7 +23,7 @@ class YearlyStatsTests {
     fun setUp() {
         appContext = InstrumentationRegistry.getInstrumentation().targetContext
         bookDBService = BookDBService(appContext)
-        yearlyStatsService = YearlyStatsDBService(appContext)
+        yearlyStatsService = YearlyStatsDBService(appContext, Calendar.getInstance())
 
     }
 
@@ -36,10 +35,16 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getTotalNumberOfPagesTest() {
+    fun getTotalNumberOfPages() {
         addBooks()
         val totalNumberOfPages = yearlyStatsService.getTotalNumberOfPages()
         assertEquals(700, totalNumberOfPages)
+    }
+
+    @Test
+    fun getTotalNumberOfPagesNoBooksInTheDatabase(){
+        val totalNumberOfPages = yearlyStatsService.getTotalNumberOfPages()
+        assertEquals(0, totalNumberOfPages)
     }
 
     @Test
@@ -50,10 +55,22 @@ class YearlyStatsTests {
     }
 
     @Test
+    fun getTotalBooksNoBooksInTheDatabase(){
+        val totalNumberOfBooks = yearlyStatsService.getTotalNumberOfBooks()
+        assertEquals(0, totalNumberOfBooks)
+    }
+
+    @Test
     fun getAverageNumberOfPagesPerBook() {
         addBooks()
         val averageNumberOfPagesPerBook = yearlyStatsService.getAverageNumberOfPagesPerBook()
         assertEquals(233.33, averageNumberOfPagesPerBook)
+    }
+
+    @Test
+    fun getAverageNumberOfPagesPerBookNoBooksInTheDatabase(){
+        val averageNumberOfPagesPerBook = yearlyStatsService.getAverageNumberOfPagesPerBook()
+        assertEquals(0.0, averageNumberOfPagesPerBook)
     }
 
     @Test
@@ -64,10 +81,22 @@ class YearlyStatsTests {
     }
 
     @Test
+    fun getAverageReadingTimeNoBooksInTheDatabase(){
+        val averageReadingTime = yearlyStatsService.getAverageReadingTime()
+        assertEquals(0, averageReadingTime)
+    }
+
+    @Test
     fun getAverageNumberOfPagesPerDay() {
         addBooks()
         val averageNumberOfPagesPerDay = yearlyStatsService.getAveragePagesPerDay()
         assertEquals(233.33, averageNumberOfPagesPerDay, 0.01)
+    }
+
+    @Test
+    fun getAverageNumberOfPagesPerDayNoBooksInTheDatabase(){
+        val averageNumberOfPagesPerDay = yearlyStatsService.getAveragePagesPerDay()
+        assertEquals(0.0, averageNumberOfPagesPerDay)
     }
 
     @Test
@@ -76,6 +105,12 @@ class YearlyStatsTests {
         addBooks()
         val averageBooksPerMonth = yearlyStatsService.getAverageBooksPerMonth()
         assertEquals(0.25, averageBooksPerMonth, 0.01)
+    }
+
+    @Test
+    fun getAverageBooksPerMonthNoBooksInTheDatabase(){
+        val averageBooksPerMonth = yearlyStatsService.getAverageBooksPerMonth()
+        assertEquals(0.0, averageBooksPerMonth)
     }
 
     @Test
@@ -88,10 +123,22 @@ class YearlyStatsTests {
     }
 
     @Test
+    fun getAverageBooksPerWeekNoBooksInTheDatabase(){
+        val averageBooksPerWeek = yearlyStatsService.getAverageBooksPerWeek()
+        assertEquals(0.0, averageBooksPerWeek)
+    }
+
+    @Test
     fun getMonthWithMostBooksRead(){
         addBooks()
         val monthWithMostBooksRead = yearlyStatsService.getMonthWithMostBooksRead()
         assertEquals("February", monthWithMostBooksRead)
+    }
+
+    @Test
+    fun getMonthWithMostBooksReadNoBooksInTheDatabase(){
+        val monthWithMostBooksRead = yearlyStatsService.getMonthWithMostBooksRead()
+        assertEquals("-", monthWithMostBooksRead)
     }
 
 
