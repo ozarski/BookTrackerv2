@@ -26,7 +26,6 @@ class MonthlyStatsTests {
         monthlyStatsService = MonthlyStatsDBService(
             appContext,
             Calendar.getInstance().apply { set(Calendar.MONTH, 0) })
-
     }
 
     @After

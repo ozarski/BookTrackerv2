@@ -3,7 +3,7 @@ package ozarskiapps.booktracker.database
 import android.content.Context
 import java.util.*
 
-class MonthlyStatsDBService(val context: Context, month: Calendar): DBService(context) {
+class MonthlyStatsDBService(val context: Context, month: Calendar) : DBService(context) {
 
     fun getTotalNumberOfPages(): Long {
         //TODO("Not implemented yet")

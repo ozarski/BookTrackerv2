@@ -23,7 +23,7 @@ class YearlyStatsTests {
     fun setUp() {
         appContext = InstrumentationRegistry.getInstrumentation().targetContext
         bookDBService = BookDBService(appContext)
-        yearlyStatsService = YearlyStatsDBService(appContext, Calendar.getInstance())
+        yearlyStatsService = YearlyStatsDBService(appContext)
 
     }
 
@@ -37,6 +37,7 @@ class YearlyStatsTests {
     @Test
     fun getTotalNumberOfPages() {
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val totalNumberOfPages = yearlyStatsService.getTotalNumberOfPages()
         assertEquals(700, totalNumberOfPages)
     }
@@ -50,6 +51,7 @@ class YearlyStatsTests {
     @Test
     fun getTotalBooks() {
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val totalNumberOfBooks = yearlyStatsService.getTotalNumberOfBooks()
         assertEquals(3, totalNumberOfBooks)
     }
@@ -63,8 +65,9 @@ class YearlyStatsTests {
     @Test
     fun getAverageNumberOfPagesPerBook() {
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val averageNumberOfPagesPerBook = yearlyStatsService.getAverageNumberOfPagesPerBook()
-        assertEquals(233.33, averageNumberOfPagesPerBook)
+        assertEquals(233.33, averageNumberOfPagesPerBook, 0.01)
     }
 
     @Test
@@ -76,21 +79,23 @@ class YearlyStatsTests {
     @Test
     fun getAverageReadingTime() {
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val averageReadingTime = yearlyStatsService.getAverageReadingTime()
-        assertEquals(1, averageReadingTime)
+        assertEquals(1.0, averageReadingTime, 0.01)
     }
 
     @Test
     fun getAverageReadingTimeNoBooksInTheDatabase(){
         val averageReadingTime = yearlyStatsService.getAverageReadingTime()
-        assertEquals(0, averageReadingTime)
+        assertEquals(0.0, averageReadingTime, 0.01)
     }
 
     @Test
     fun getAverageNumberOfPagesPerDay() {
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val averageNumberOfPagesPerDay = yearlyStatsService.getAveragePagesPerDay()
-        assertEquals(233.33, averageNumberOfPagesPerDay, 0.01)
+        assertEquals(350.0, averageNumberOfPagesPerDay, 0.01)
     }
 
     @Test
@@ -103,6 +108,7 @@ class YearlyStatsTests {
     fun getAverageBooksPerMonth()
     {
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val averageBooksPerMonth = yearlyStatsService.getAverageBooksPerMonth()
         assertEquals(0.25, averageBooksPerMonth, 0.01)
     }
@@ -116,10 +122,10 @@ class YearlyStatsTests {
     @Test
     fun getAverageBooksPerWeek(){
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val averageBooksPerWeek = yearlyStatsService.getAverageBooksPerWeek()
-        Calendar.WEEK_OF_YEAR
 
-        assertEquals(17.66, averageBooksPerWeek, 0.01)
+        assertEquals(0.06, averageBooksPerWeek, 0.01)
     }
 
     @Test
@@ -131,6 +137,7 @@ class YearlyStatsTests {
     @Test
     fun getMonthWithMostBooksRead(){
         addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
         val monthWithMostBooksRead = yearlyStatsService.getMonthWithMostBooksRead()
         assertEquals("February", monthWithMostBooksRead)
     }
@@ -139,6 +146,17 @@ class YearlyStatsTests {
     fun getMonthWithMostBooksReadNoBooksInTheDatabase(){
         val monthWithMostBooksRead = yearlyStatsService.getMonthWithMostBooksRead()
         assertEquals("-", monthWithMostBooksRead)
+    }
+
+    @Test
+    fun getNumberOfBooksForMonth(){
+        addBooks()
+        yearlyStatsService.setYear(Calendar.getInstance())
+        val numberOfBooksForMonth = yearlyStatsService.getNumberOfBooksForMonth(
+            Calendar.getInstance()
+                .apply { set(Calendar.MONTH, 1)}
+        )
+        assertEquals(2, numberOfBooksForMonth)
     }
 
 
@@ -191,9 +209,22 @@ class YearlyStatsTests {
                 .apply { set(Calendar.MONTH, 0)}
         )
 
-        book1.id = bookDBService.addBook(book1)
-        book2.id = bookDBService.addBook(book2)
-        book3.id = bookDBService.addBook(book3)
-        book4.id = bookDBService.addBook(book4)
+        val book5 = Book(
+            "Book 5",
+            "Author 5",
+            500,
+            0,
+            BookStatus.Reading,
+            Calendar.getInstance()
+                .apply { set(Calendar.MONTH, 0)},
+            Calendar.getInstance()
+                .apply { set(Calendar.MONTH, 0)}
+        )
+
+        bookDBService.addBook(book1)
+        bookDBService.addBook(book2)
+        bookDBService.addBook(book3)
+        bookDBService.addBook(book4)
+        bookDBService.addBook(book5)
     }
 }
