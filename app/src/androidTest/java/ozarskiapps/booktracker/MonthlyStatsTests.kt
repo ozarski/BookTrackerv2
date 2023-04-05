@@ -3,6 +3,7 @@ package ozarskiapps.booktracker
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import junit.framework.TestCase
+import junit.framework.TestCase.assertEquals
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -18,14 +19,13 @@ class MonthlyStatsTests {
     private lateinit var appContext: Context
     private lateinit var bookDBService: BookDBService
     private lateinit var monthlyStatsService: MonthlyStatsDBService
+    private val calendar  = Calendar.getInstance().apply { set(Calendar.MONTH, 0) }
 
     @Before
     fun setUp() {
         appContext = InstrumentationRegistry.getInstrumentation().targetContext
         bookDBService = BookDBService(appContext)
-        monthlyStatsService = MonthlyStatsDBService(
-            appContext,
-            Calendar.getInstance().apply { set(Calendar.MONTH, 0) })
+        monthlyStatsService = MonthlyStatsDBService(appContext)
     }
 
     @After
@@ -38,6 +38,7 @@ class MonthlyStatsTests {
     @Test
     fun getTotalNumberOfPages() {
         addBooks()
+        monthlyStatsService.setMonth(calendar)
         val totalNumberOfPages = monthlyStatsService.getTotalNumberOfPages()
         TestCase.assertEquals(300, totalNumberOfPages)
     }
@@ -51,6 +52,7 @@ class MonthlyStatsTests {
     @Test
     fun getTotalBooks() {
         addBooks()
+        monthlyStatsService.setMonth(calendar)
         val totalNumberOfBooks = monthlyStatsService.getTotalNumberOfBooks()
         TestCase.assertEquals(2, totalNumberOfBooks)
     }
@@ -64,6 +66,7 @@ class MonthlyStatsTests {
     @Test
     fun getAverageNumberOfPagesPerBook() {
         addBooks()
+        monthlyStatsService.setMonth(calendar)
         val averageNumberOfPagesPerBook = monthlyStatsService.getAverageNumberOfPagesPerBook()
         TestCase.assertEquals(150.0, averageNumberOfPagesPerBook, 0.01)
     }
@@ -77,42 +80,45 @@ class MonthlyStatsTests {
     @Test
     fun getAverageReadingTime() {
         addBooks()
+        monthlyStatsService.setMonth(calendar)
         val averageReadingTime = monthlyStatsService.getAverageReadingTime()
-        TestCase.assertEquals(1, averageReadingTime)
+        assertEquals(0.5, averageReadingTime)
     }
 
     @Test
     fun getAverageReadingTimeNoBooksInTheDatabase() {
         val averageReadingTime = monthlyStatsService.getAverageReadingTime()
-        TestCase.assertEquals(0, averageReadingTime)
+        assertEquals(0.0, averageReadingTime, 0.01)
     }
 
     @Test
     fun getAverageNumberOfPagesPerDay() {
         addBooks()
+        monthlyStatsService.setMonth(calendar)
         val averageNumberOfPagesPerDay = monthlyStatsService.getAveragePagesPerDay()
-        TestCase.assertEquals(150.0, averageNumberOfPagesPerDay, 0.01)
+        assertEquals(300.0, averageNumberOfPagesPerDay, 0.01)
     }
 
     @Test
     fun getAverageNumberOfPagesPerDayNoBooksInTheDatabase() {
         val averageNumberOfPagesPerDay = monthlyStatsService.getAveragePagesPerDay()
-        TestCase.assertEquals(0.0, averageNumberOfPagesPerDay)
+        assertEquals(0.0, averageNumberOfPagesPerDay)
     }
 
     @Test
     fun getAverageBooksPerWeek() {
         addBooks()
+        monthlyStatsService.setMonth(calendar)
         val averageBooksPerWeek = monthlyStatsService.getAverageBooksPerWeek()
         Calendar.WEEK_OF_YEAR
 
-        TestCase.assertEquals(60.0, averageBooksPerWeek, 0.01)
+        assertEquals(0.5, averageBooksPerWeek, 0.01)
     }
 
     @Test
     fun getAverageBooksPerWeekNoBooksInTheDatabase() {
         val averageBooksPerWeek = monthlyStatsService.getAverageBooksPerWeek()
-        TestCase.assertEquals(0.0, averageBooksPerWeek)
+        assertEquals(0.0, averageBooksPerWeek)
     }
 
     private fun addBooks() {

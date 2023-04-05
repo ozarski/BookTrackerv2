@@ -25,3 +25,9 @@ fun setCalendar(calendar: Calendar, dayStart: Boolean = true): Calendar {
     }
     return calendar
 }
+
+fun calendarFromMillis(millis: Long): Calendar{
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = millis
+    return calendar
+}

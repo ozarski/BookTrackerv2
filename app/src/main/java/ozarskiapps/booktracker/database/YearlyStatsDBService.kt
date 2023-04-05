@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.provider.BaseColumns
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
+import ozarskiapps.booktracker.calendarFromMillis
 import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
@@ -17,6 +18,7 @@ class YearlyStatsDBService(
 
     fun setYear(year: Calendar) {
         books = getBooksForYear(year)
+        this.year.timeInMillis = year.timeInMillis
     }
 
     private fun getBooksForYear(year: Calendar): List<Book> {
@@ -93,7 +95,6 @@ class YearlyStatsDBService(
         val startTime = getCalendarYearStart()
         val endTime = getCalendarYearEnd()
         val readingTime = readingTimeDBService.getTotalReadingTimeForTimePeriod(startTime, endTime)
-        println("Reading time: $readingTime")
         return if (readingTime == 0) 0.0
         else getTotalNumberOfPages() / readingTime.toDouble()
     }
@@ -166,20 +167,14 @@ class YearlyStatsDBService(
         val endDateMillis =
             cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
         val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-        val startDate = Calendar.getInstance().apply {
-            timeInMillis = startDateMillis
-        }
-        val endDate = Calendar.getInstance().apply {
-            timeInMillis = endDateMillis
-        }
         val book = Book(
             title,
             author,
             numberOfPages,
             currentProgress,
             bookStatus,
-            startDate,
-            endDate,
+            calendarFromMillis(startDateMillis),
+            calendarFromMillis(endDateMillis),
             id
         )
         return book

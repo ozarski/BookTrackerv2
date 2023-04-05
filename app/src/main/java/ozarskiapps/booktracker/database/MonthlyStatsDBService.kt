@@ -1,38 +1,136 @@
 package ozarskiapps.booktracker.database
 
 import android.content.Context
+import android.database.Cursor
+import android.provider.BaseColumns
+import ozarskiapps.booktracker.book.Book
+import ozarskiapps.booktracker.book.BookStatus
+import ozarskiapps.booktracker.calendarFromMillis
 import java.util.*
 
-class MonthlyStatsDBService(val context: Context, month: Calendar) : DBService(context) {
+class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar.getInstance()) :
+    DBService(context) {
+
+    var books = getBooksForMonth(month)
+
+    fun setMonth(month: Calendar) {
+        books = getBooksForMonth(month)
+        this.month.timeInMillis = month.timeInMillis
+    }
+
+    fun getBooksForMonth(month: Calendar): List<Book> {
+        val db = this.readableDatabase
+        val projection = arrayOf(
+            BaseColumns._ID,
+            DatabaseConstants.BookTable.TITLE_COLUMN,
+            DatabaseConstants.BookTable.AUTHOR_COLUMN,
+            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
+            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
+            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
+            DatabaseConstants.BookTable.START_DATE_COLUMN,
+            DatabaseConstants.BookTable.END_DATE_COLUMN,
+        )
+        val selection =
+            "${DatabaseConstants.BookTable.END_DATE_COLUMN} >= ? " +
+                    "AND ${DatabaseConstants.BookTable.END_DATE_COLUMN} <= ? " +
+                    "AND ${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val startCal = getCalendarMonthStart(month)
+        val endCal = getCalendarMonthEnd(month)
+        val selectionArgs = arrayOf(
+            startCal.timeInMillis.toString(),
+            endCal.timeInMillis.toString(),
+            BookStatus.Finished.toString()
+        )
+        val cursor = db.query(
+            DatabaseConstants.BookTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+        val booksForMonth = mutableListOf<Book>()
+        with(cursor) {
+            while (cursor.moveToNext()) {
+                val book = getBookFromCursor(cursor)
+                booksForMonth.add(book)
+            }
+        }
+        return booksForMonth
+
+    }
+
+    private fun getBookFromCursor(cursor: Cursor): Book {
+        val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
+        val title =
+            cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
+        val author =
+            cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
+        val numberOfPages =
+            cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
+        val currentProgress =
+            cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+        val bookStatus =
+            BookStatus.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN)))
+        val startDateMillis =
+            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
+        val endDateMillis =
+            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
+        return Book(
+            title,
+            author,
+            numberOfPages,
+            currentProgress,
+            bookStatus,
+            calendarFromMillis(startDateMillis),
+            calendarFromMillis(endDateMillis),
+            id
+        )
+    }
 
     fun getTotalNumberOfPages(): Long {
-        //TODO("Not implemented yet")
-        return -1
+        if (getTotalNumberOfBooks() == 0) return 0
+
+        return books.sumOf { it.numberOfPages }.toLong()
     }
 
     fun getTotalNumberOfBooks(): Int {
-        //TODO("Not implemented yet")
-        return -1
+        return books.size
     }
 
     fun getAverageNumberOfPagesPerBook(): Double {
-        //TODO("Not implemented yet")
-        return -1.0
+        if (getTotalNumberOfBooks() == 0) return 0.0
+        return getTotalNumberOfPages().toDouble() / getTotalNumberOfBooks()
     }
 
     fun getAverageReadingTime(): Double {
-        //TODO("Not implemented yet")
-        return -1.0
+        val readingTimeDBService = ReadingTimeDBService(context)
+        val monthStart = getCalendarMonthStart(month)
+        val monthEnd = getCalendarMonthEnd(month)
+        val readingTime = readingTimeDBService.getTotalReadingTimeForTimePeriod(
+            monthStart,
+            monthEnd
+        )
+        if (readingTime == 0) return 0.0
+        return readingTime.toDouble() / getTotalNumberOfBooks()
     }
 
     fun getAveragePagesPerDay(): Double {
-        //TODO("Not implemented yet")
-        return -1.0
+        val readingTimeDBService = ReadingTimeDBService(context)
+        val monthStart = getCalendarMonthStart(month)
+        val monthEnd = getCalendarMonthEnd(month)
+        val readingTime = readingTimeDBService.getTotalReadingTimeForTimePeriod(
+            monthStart,
+            monthEnd
+        )
+        if (readingTime == 0) return 0.0
+        return getTotalNumberOfPages().toDouble() / readingTime
     }
 
     fun getAverageBooksPerWeek(): Double {
-        //TODO("Not implemented yet")
-        return -1.0
+        if(getTotalNumberOfBooks()==0) return 0.0
+        return getTotalNumberOfBooks().toDouble() / 4.0
     }
 
     fun getCalendarMonthStart(calendar: Calendar): Calendar {
