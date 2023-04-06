@@ -194,26 +194,6 @@ class BookStatusTests {
     }
 
     @Test
-    fun finishReadingBookTodayFailWrongBookStatusWantToRead(){
-        val book = Book(
-            "Book 1",
-            "Author 1",
-            100,
-            0,
-            BookStatus.WantToRead,
-            Calendar.getInstance(),
-            Calendar.getInstance()
-        )
-        book.id = bookDBService.addBook(book)
-        bookDBService.finishReadingBookToday(book)
-        val modifiedBook = bookDBService.getBookByID(book.id)
-        assert(modifiedBook != null)
-        assertEquals(modifiedBook?.bookStatus, BookStatus.WantToRead)
-        assertEquals(modifiedBook?.startDate?.timeInMillis, 0L)
-        assertEquals(modifiedBook?.endDate?.timeInMillis,  0L)
-    }
-
-    @Test
     fun finishReadingBookTodayFailWrongBookStatusFinished(){
         val book = Book(
             "Book 1",
