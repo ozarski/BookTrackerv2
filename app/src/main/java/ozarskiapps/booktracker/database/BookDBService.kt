@@ -22,7 +22,7 @@ class BookDBService(val context: Context) : DBService(context) {
             put(DatabaseConstants.BookTable.END_DATE_COLUMN, book.endDate.timeInMillis)
         }
 
-        val id =  db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues)
+        val id = db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues)
         book.id = id
         ReadingTimeDBService(context).addBookReadingTime(book)
         return id
@@ -73,7 +73,7 @@ class BookDBService(val context: Context) : DBService(context) {
                     getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
 
                 val bookStatusEnum = BookStatus.valueOf(bookStatus)
-                val startDateCalendar = Calendar.getInstance().apply{ timeInMillis = startDate }
+                val startDateCalendar = Calendar.getInstance().apply { timeInMillis = startDate }
                 val endDateCalendar = Calendar.getInstance().apply { timeInMillis = endDate }
 
                 return Book(
@@ -91,7 +91,7 @@ class BookDBService(val context: Context) : DBService(context) {
         return null
     }
 
-    fun updateBook(book: Book){
+    fun updateBook(book: Book) {
         val db = this.writableDatabase
 
         val contentValues = ContentValues().apply {
@@ -111,7 +111,7 @@ class BookDBService(val context: Context) : DBService(context) {
         ReadingTimeDBService(context).updateBookReadingTime(book)
     }
 
-    fun deleteBookByID(id: Long){
+    fun deleteBookByID(id: Long) {
         val db = this.writableDatabase
 
         val selection = "${BaseColumns._ID} = ?"
@@ -119,5 +119,22 @@ class BookDBService(val context: Context) : DBService(context) {
 
         db.delete(DatabaseConstants.BookTable.TABLE_NAME, selection, selectionArgs)
         ReadingTimeDBService(context).deleteBookReadingTimeByBookID(id)
+    }
+
+    fun getAllWantToReadBooks(): List<Book> {
+        //TODO("Not implemented yet")
+        return emptyList()
+    }
+
+    fun startReadingBookToday(book: Book) {
+        //TODO("Not implemented yet")
+    }
+
+    fun finishReadingBookToday(book: Book) {
+        //TODO("Not implemented yet")
+    }
+
+    fun wantToReadCalendar(): Calendar {
+        return Calendar.getInstance().apply { timeInMillis = 0 }
     }
 }

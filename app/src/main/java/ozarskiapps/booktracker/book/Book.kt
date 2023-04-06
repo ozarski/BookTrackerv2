@@ -30,7 +30,15 @@ class Book(
         setCalendar(startDate),
         setCalendar(endDate, false),
         -1
-    )
+    ){
+        if(bookStatus == BookStatus.WantToRead){
+            this.startDate.timeInMillis = 0
+            this.endDate.timeInMillis = 0
+        }
+        else if(bookStatus == BookStatus.Reading){
+            this.endDate.timeInMillis = 0
+        }
+    }
 
     fun getBookReadingTimeInDays(): Int{
         return if(bookStatus == BookStatus.Finished){

@@ -11,14 +11,14 @@ import java.util.*
 class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar.getInstance()) :
     DBService(context) {
 
-    var books = getBooksForMonth(month)
+    private var books = getBooksForMonth(month)
 
     fun setMonth(month: Calendar) {
         books = getBooksForMonth(month)
         this.month.timeInMillis = month.timeInMillis
     }
 
-    fun getBooksForMonth(month: Calendar): List<Book> {
+    private fun getBooksForMonth(month: Calendar): List<Book> {
         val db = this.readableDatabase
         val projection = arrayOf(
             BaseColumns._ID,
@@ -51,11 +51,9 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
             null
         )
         val booksForMonth = mutableListOf<Book>()
-        with(cursor) {
-            while (cursor.moveToNext()) {
-                val book = getBookFromCursor(cursor)
-                booksForMonth.add(book)
-            }
+        while (cursor.moveToNext()) {
+            val book = getBookFromCursor(cursor)
+            booksForMonth.add(book)
         }
         return booksForMonth
 
@@ -133,7 +131,7 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
         return getTotalNumberOfBooks().toDouble() / 4.0
     }
 
-    fun getCalendarMonthStart(calendar: Calendar): Calendar {
+    private fun getCalendarMonthStart(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis
         }
@@ -144,7 +142,7 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
         return cal
     }
 
-    fun getCalendarMonthEnd(calendar: Calendar): Calendar {
+    private fun getCalendarMonthEnd(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis
         }

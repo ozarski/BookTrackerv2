@@ -6,7 +6,6 @@ import android.provider.BaseColumns
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.calendarFromMillis
-import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
 class YearlyStatsDBService(
@@ -14,14 +13,14 @@ class YearlyStatsDBService(
     private var year: Calendar = Calendar.getInstance()
 ) : DBService(context) {
 
-    private var books = getBooksForYear(year)
+    private var books = getBooksForYear()
 
     fun setYear(year: Calendar) {
-        books = getBooksForYear(year)
+        books = getBooksForYear()
         this.year.timeInMillis = year.timeInMillis
     }
 
-    private fun getBooksForYear(year: Calendar): List<Book> {
+    private fun getBooksForYear(): List<Book> {
         val db = this.readableDatabase
         val projection = arrayOf(
             BaseColumns._ID,
@@ -56,11 +55,9 @@ class YearlyStatsDBService(
         )
 
         val books = mutableListOf<Book>()
-        with(cursor) {
-            while (cursor.moveToNext()) {
-                val book = getBookFromCursor(cursor)
-                books.add(book)
-            }
+        while (cursor.moveToNext()) {
+            val book = getBookFromCursor(cursor)
+            books.add(book)
         }
         return books
     }
@@ -129,7 +126,7 @@ class YearlyStatsDBService(
         return month ?: "-"
     }
 
-    fun getCalendarMonthStart(calendar: Calendar): Calendar {
+    private fun getCalendarMonthStart(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis
         }
@@ -140,7 +137,7 @@ class YearlyStatsDBService(
         return cal
     }
 
-    fun getCalendarMonthEnd(calendar: Calendar): Calendar {
+    private fun getCalendarMonthEnd(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis
         }
@@ -151,7 +148,7 @@ class YearlyStatsDBService(
         return cal
     }
 
-    fun getBookFromCursor(cursor: Cursor): Book {
+    private fun getBookFromCursor(cursor: Cursor): Book {
         val title =
             cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
         val author =
@@ -167,7 +164,7 @@ class YearlyStatsDBService(
         val endDateMillis =
             cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
         val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-        val book = Book(
+        return Book(
             title,
             author,
             numberOfPages,
@@ -177,10 +174,9 @@ class YearlyStatsDBService(
             calendarFromMillis(endDateMillis),
             id
         )
-        return book
     }
 
-    fun getCalendarYearStart(): Calendar{
+    private fun getCalendarYearStart(): Calendar{
         val cal = Calendar.getInstance().apply {
             timeInMillis = year.timeInMillis
         }
@@ -192,7 +188,7 @@ class YearlyStatsDBService(
         return cal
     }
 
-    fun getCalendarYearEnd(): Calendar{
+    private fun getCalendarYearEnd(): Calendar{
         val cal = Calendar.getInstance().apply {
             timeInMillis = year.timeInMillis
         }

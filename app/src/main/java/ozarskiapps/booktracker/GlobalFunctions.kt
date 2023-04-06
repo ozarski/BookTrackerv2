@@ -1,15 +1,6 @@
 package ozarskiapps.booktracker
 
-import ozarskiapps.booktracker.book.Book
 import java.util.*
-
-//fun mockBookList(): List<Book> {
-//    val list = mutableListOf<Book>()
-//    for (i in 0..20) {
-//        list.add(Book("Full book title $i", "Author name $i", i*42))
-//    }
-//    return list
-//}
 
 fun setCalendar(calendar: Calendar, dayStart: Boolean = true): Calendar {
     if(dayStart){
