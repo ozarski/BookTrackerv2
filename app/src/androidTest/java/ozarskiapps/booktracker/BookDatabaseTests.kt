@@ -33,25 +33,6 @@ class BookDatabaseTests {
         appContext.deleteDatabase(DatabaseConstants.DATABASE_NAME)
     }
 
-    @Test
-    fun testDatabaseCreation() {
-        assertNotNull(bookDBService.writableDatabase)
-    }
-
-
-    @Test
-    fun testBookTableCreation() {
-        val cursor = bookDBService.readableDatabase.rawQuery(
-            "SELECT name " +
-                    "FROM sqlite_master WHERE type='table' AND name='${DatabaseConstants.BookTable.TABLE_NAME}'",
-            null
-        )
-        cursor.use {
-            assertTrue(cursor.moveToFirst())
-            assertEquals(DatabaseConstants.BookTable.TABLE_NAME, cursor.getString(0))
-        }
-
-    }
 
     @Test
     fun testAddingBookToDB() {

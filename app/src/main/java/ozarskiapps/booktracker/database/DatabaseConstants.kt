@@ -21,6 +21,14 @@ object DatabaseConstants{
             "${ReadingTimeTable.BOOK_ID_COLUMN} TEXT NOT NULL," +
             "${ReadingTimeTable.DATE_COLUMN} LONG NOT NULL)"
 
+    const val TAG_TABLE_CREATE_QUERY = "CREATE TABLE ${TagTable.TABLE_NAME} (" +
+            "${BaseColumns._ID} INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "${TagTable.TAG_NAME_COLUMN} TEXT NOT NULL)"
+
+    const val BOOK_TAG_TABLE_CREATE_QUERY = "CREATE TABLE ${BookTagTable.TABLE_NAME} (" +
+            "${BookTagTable.BOOK_ID_COLUMN} INTEGER NOT NULL," +
+            "${BookTagTable.TAG_ID_COLUMN} INTEGER NOT NULL)"
+
     object BookTable: BaseColumns {
         const val TABLE_NAME = "books"
         const val TITLE_COLUMN = "title"
@@ -36,5 +44,16 @@ object DatabaseConstants{
         const val TABLE_NAME = "reading_time"
         const val BOOK_ID_COLUMN = "book_id"
         const val DATE_COLUMN = "date"
+    }
+
+    object TagTable: BaseColumns{
+        const val TABLE_NAME = "tags"
+        const val TAG_NAME_COLUMN = "tag_name"
+    }
+
+    object BookTagTable{
+        const val TABLE_NAME = "book_tags"
+        const val BOOK_ID_COLUMN = "book_id"
+        const val TAG_ID_COLUMN = "tag_id"
     }
 }
