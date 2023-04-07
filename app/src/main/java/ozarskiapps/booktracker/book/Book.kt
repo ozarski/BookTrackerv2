@@ -1,5 +1,6 @@
 package ozarskiapps.booktracker.book
 
+import ozarskiapps.booktracker.OpenLibraryAPI.OpenLibraryAPIBook
 import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
@@ -39,6 +40,16 @@ class Book(
             this.endDate.timeInMillis = 0
         }
     }
+
+    constructor(bookData: OpenLibraryAPIBook): this(
+        bookData.title,
+        bookData.authorsToString(),
+        bookData.numberOfPagesMedian,
+        0,
+        BookStatus.WantToRead,
+        Calendar.getInstance().apply{ timeInMillis = 0L },
+        Calendar.getInstance().apply{ timeInMillis = 0L }
+    )
 
     fun getBookReadingTimeInDays(): Int{
         return if(bookStatus == BookStatus.Finished){
