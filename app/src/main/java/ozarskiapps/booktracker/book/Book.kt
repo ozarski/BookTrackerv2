@@ -39,6 +39,11 @@ class Book(
         else if(bookStatus == BookStatus.Reading){
             this.endDate.timeInMillis = 0
         }
+        else if (bookStatus == BookStatus.Finished){
+            if(this.startDate.timeInMillis > this.endDate.timeInMillis){
+                this.endDate.timeInMillis = this.startDate.timeInMillis
+            }
+        }
     }
 
     constructor(bookData: OpenLibraryAPIBook): this(

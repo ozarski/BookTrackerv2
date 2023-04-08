@@ -84,6 +84,26 @@ class BookDatabaseTests {
     }
 
     @Test
+    fun testAddBookWrongEndDate() {
+        val book = Book(
+            "Full book title",
+            "Author name",
+            42,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+        )
+        bookDBService.addBook(book)
+        testGettingBookByID()
+
+        val bookWithCorrectedDate = bookDBService.getBookByID(book.id)
+        assertNotNull(bookWithCorrectedDate)
+        assertEquals(book.endDate.timeInMillis, bookWithCorrectedDate?.startDate?.timeInMillis)
+
+    }
+
+    @Test
     fun testModifyingBook() {
         val book = Book(
             "Full book title",
