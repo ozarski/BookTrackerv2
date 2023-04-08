@@ -184,4 +184,11 @@ class BookDBService(val context: Context) : DBService(context) {
             id
         )
     }
+
+    fun updateBookProgress(book: Book, progress: Int){
+        if(book.bookStatus == BookStatus.Reading){
+            book.currentProgress = progress
+            updateBook(book)
+        }
+    }
 }

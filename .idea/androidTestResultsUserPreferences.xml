@@ -105,6 +105,20 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="187217478">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="BETCCMKVEQMVGU8H" value="120" />
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="realme&#10; RMX2155" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="313384418">
           <value>
             <AndroidTestResultsTableState>
