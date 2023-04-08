@@ -94,6 +94,7 @@ class BookDBService(val context: Context) : DBService(context) {
 
         db.delete(DatabaseConstants.BookTable.TABLE_NAME, selection, selectionArgs)
         ReadingTimeDBService(context).deleteBookReadingTimeByBookID(id)
+        TagDBService(context).removeTagFromBook(bookID = id)
     }
 
     fun getAllWantToReadBooks(): List<Book> {

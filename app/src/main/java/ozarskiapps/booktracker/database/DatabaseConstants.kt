@@ -23,7 +23,8 @@ object DatabaseConstants{
 
     const val TAG_TABLE_CREATE_QUERY = "CREATE TABLE ${TagTable.TABLE_NAME} (" +
             "${BaseColumns._ID} INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "${TagTable.TAG_NAME_COLUMN} TEXT NOT NULL)"
+            "${TagTable.TAG_NAME_COLUMN} TEXT NOT NULL," +
+            "${TagTable.TAG_COLOR_COLUMN} TEXT NOT NULL)"
 
     const val BOOK_TAG_TABLE_CREATE_QUERY = "CREATE TABLE ${BookTagTable.TABLE_NAME} (" +
             "${BookTagTable.BOOK_ID_COLUMN} INTEGER NOT NULL," +
@@ -49,6 +50,7 @@ object DatabaseConstants{
     object TagTable: BaseColumns{
         const val TABLE_NAME = "tags"
         const val TAG_NAME_COLUMN = "tag_name"
+        const val TAG_COLOR_COLUMN = "tag_color"
     }
 
     object BookTagTable{

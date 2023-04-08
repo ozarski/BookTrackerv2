@@ -1,3 +1,3 @@
 package ozarskiapps.booktracker.tag
 
-data class Tag(var name: String, var id: Long = -1)
+data class Tag(var name: String, var color: String, var id: Long = -1)

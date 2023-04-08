@@ -26,28 +26,30 @@ class TagTests {
     @After
     fun tearDown() {
         tagDBService.close()
-        applicationContext.deleteDatabase("BookTrackerDB")
+        applicationContext.deleteDatabase(DatabaseConstants.DATABASE_NAME)
     }
 
     @Test
     fun addTagToDB() {
-        val tag = Tag("Test tag")
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
     }
 
     @Test
     fun updateTag() {
-        val tag = Tag("Test tag")
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         tag.name = "Updated tag"
         tagDBService.updateTag(tag)
         val projection = arrayOf(BaseColumns._ID, DatabaseConstants.TagTable.TAG_NAME_COLUMN)
+        val selection = "${BaseColumns._ID} = ?"
+        val selectionArgs = arrayOf(tag.id.toString())
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.TagTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -61,8 +63,8 @@ class TagTests {
     }
 
     @Test
-    fun removeTag(){
-        val tag = Tag("Test tag")
+    fun removeTag() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         tagDBService.deleteTagByID(tag.id)
@@ -80,8 +82,8 @@ class TagTests {
     }
 
     @Test
-    fun getTagByID(){
-        val tag = Tag("Test tag")
+    fun getTagByID() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val tagFromDB = tagDBService.getTagByID(tag.id)
@@ -89,8 +91,8 @@ class TagTests {
     }
 
     @Test
-    fun getTagByIDFail(){
-        val tag = Tag("Test tag")
+    fun getTagByIDFail() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val tagFromDB = tagDBService.getTagByID(tag.id + 1)
@@ -98,14 +100,14 @@ class TagTests {
     }
 
     @Test
-    fun getAllTags(){
-        val tag1 = Tag("Test tag 1")
+    fun getAllTags() {
+        val tag1 = Tag("Test tag 1", "#FFFFFF")
         tag1.id = tagDBService.addTag(tag1)
         testTagAddSuccess(tag1)
-        val tag2 = Tag("Test tag 2")
+        val tag2 = Tag("Test tag 2", "#FFFFFF")
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
-        val tag3 = Tag("Test tag 3")
+        val tag3 = Tag("Test tag 3", "#FFFFFF")
         tag3.id = tagDBService.addTag(tag3)
         testTagAddSuccess(tag3)
 
@@ -117,21 +119,24 @@ class TagTests {
     }
 
     @Test
-    fun getAllTagsFailNoTagInDB(){
+    fun getAllTagsFailNoTagInDB() {
         val tags = tagDBService.getAllTags()
         assertEquals(0, tags.size)
         assertEquals(emptyList<Tag>(), tags)
     }
 
     @Test
-    fun addTagToBook(){
-        val tag = Tag("Test tag")
+    fun addTagToBook() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
 
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN, DatabaseConstants.BookTagTable.TAG_ID_COLUMN)
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
@@ -143,23 +148,28 @@ class TagTests {
         )
 
         assert(cursor.moveToFirst())
-        val bookIDFromDB = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN))
-        val tagIDFromDB = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.TAG_ID_COLUMN))
+        val bookIDFromDB =
+            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN))
+        val tagIDFromDB =
+            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.TAG_ID_COLUMN))
 
         assertEquals(bookID, bookIDFromDB)
         assertEquals(tag.id, tagIDFromDB)
     }
 
     @Test
-    fun removeTagFromBook(){
-        val tag = Tag("Test tag")
+    fun removeTagFromBook() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
         tagDBService.removeTagFromBook(tag.id, bookID)
 
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN, DatabaseConstants.BookTagTable.TAG_ID_COLUMN)
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
@@ -174,15 +184,18 @@ class TagTests {
     }
 
     @Test
-    fun removeTagFromBookFailWrongTagID(){
-        val tag = Tag("Test tag")
+    fun removeTagFromBookFailWrongTagID() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
         tagDBService.removeTagFromBook(tag.id + 1, bookID)
 
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN, DatabaseConstants.BookTagTable.TAG_ID_COLUMN)
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
@@ -197,15 +210,18 @@ class TagTests {
     }
 
     @Test
-    fun removeTagFromBookFailWrongBookID(){
-        val tag = Tag("Test tag")
+    fun removeTagFromBookFailWrongBookID() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
         tagDBService.removeTagFromBook(tag.id, bookID + 1)
 
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN, DatabaseConstants.BookTagTable.TAG_ID_COLUMN)
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
@@ -220,15 +236,18 @@ class TagTests {
     }
 
     @Test
-    fun removeTagFromBookOnTagDelete(){
-        val tag = Tag("Test tag")
+    fun removeTagFromBookOnTagDelete() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
         tagDBService.deleteTagByID(tag.id)
 
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN, DatabaseConstants.BookTagTable.TAG_ID_COLUMN)
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
@@ -243,11 +262,11 @@ class TagTests {
     }
 
     @Test
-    fun removeTagBookRecordsOnBookDelete(){
-        val tag = Tag("Test tag")
+    fun removeTagBookRecordsOnBookDelete() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2")
+        val tag2 = Tag("Test tag 2", "#FFFFFF")
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val bookID = 1L
@@ -255,7 +274,10 @@ class TagTests {
         tagDBService.assignTagToBook(tag2.id, bookID)
         BookDBService(applicationContext).deleteBookByID(bookID)
 
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN, DatabaseConstants.BookTagTable.TAG_ID_COLUMN)
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
@@ -270,8 +292,8 @@ class TagTests {
     }
 
     @Test
-    fun getNumberOfBooksUnderTag(){
-        val tag = Tag("Test tag")
+    fun getNumberOfBooksUnderTag() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
@@ -281,8 +303,8 @@ class TagTests {
     }
 
     @Test
-    fun getNumberOfBookUnderTagFailNoBooksInDB(){
-        val tag = Tag("Test tag")
+    fun getNumberOfBookUnderTagFailNoBooksInDB() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val numberOfBooks = tagDBService.getNumberOfBooksUnderTag(tag.id)
@@ -290,8 +312,8 @@ class TagTests {
     }
 
     @Test
-    fun getBooksForOneTag(){
-        val tag = Tag("Test tag")
+    fun getBooksForOneTag() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
@@ -302,8 +324,8 @@ class TagTests {
     }
 
     @Test
-    fun getBooksForOneTagFailNoBooksAssignedToTag(){
-        val tag = Tag("Test tag")
+    fun getBooksForOneTagFailNoBooksAssignedToTag() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val books = tagDBService.getBooksForTagIDs(listOf(tag.id))
@@ -311,11 +333,11 @@ class TagTests {
     }
 
     @Test
-    fun getBooksForTwoTags(){
-        val tag = Tag("Test tag")
+    fun getBooksForTwoTags() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2")
+        val tag2 = Tag("Test tag 2", "#FFFFFF")
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val bookID = 1L
@@ -327,11 +349,11 @@ class TagTests {
     }
 
     @Test
-    fun getBooksForTwoTagsFailNoBooksAssignedToOneTag(){
-        val tag = Tag("Test tag")
+    fun getBooksForTwoTagsFailNoBooksAssignedToOneTag() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2")
+        val tag2 = Tag("Test tag 2", "#FFFFFF")
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val bookID = 1L
@@ -341,24 +363,30 @@ class TagTests {
     }
 
     @Test
-    fun getBooksForTwoTagsFailNoBooksAssignedToBothTags(){
-        val tag = Tag("Test tag")
+    fun getBooksForTwoTagsFailNoBooksAssignedToBothTags() {
+        val tag = Tag("Test tag", "#FFFFFF")
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2")
+        val tag2 = Tag("Test tag 2", "#FFFFFF")
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val books = tagDBService.getBooksForTagIDs(listOf(tag.id, tag2.id))
         assertEquals(0, books.size)
     }
 
-    private fun testTagAddSuccess(tag: Tag){
-        val projection = arrayOf(BaseColumns._ID, DatabaseConstants.TagTable.TAG_NAME_COLUMN)
+    private fun testTagAddSuccess(tag: Tag) {
+        val projection = arrayOf(
+            BaseColumns._ID,
+            DatabaseConstants.TagTable.TAG_NAME_COLUMN,
+            DatabaseConstants.TagTable.TAG_COLOR_COLUMN
+        )
+        val selection = "${BaseColumns._ID} = ?"
+        val selectionArgs = arrayOf(tag.id.toString())
         val cursor = tagDBService.readableDatabase.query(
             DatabaseConstants.TagTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -369,5 +397,6 @@ class TagTests {
             cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_NAME_COLUMN))
         assertEquals(tag.id, id)
         assertEquals(tag.name, name)
+        assertEquals(tag.color, tag.color)
     }
 }
