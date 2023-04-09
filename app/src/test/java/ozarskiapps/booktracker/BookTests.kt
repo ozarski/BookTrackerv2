@@ -60,4 +60,20 @@ class BookTests {
 
         assertEquals(-1, readingTime)
     }
+
+    @Test
+    fun getBookDaysSinceStart(){
+        val book = Book(
+            "Full book title",
+            "Author name",
+            100,
+            0,
+            BookStatus.Reading,
+            Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -2) },
+            Calendar.getInstance()
+        )
+        val daysSinceStart = book.getDaysSinceStart()
+
+        assertEquals(3, daysSinceStart)
+    }
 }

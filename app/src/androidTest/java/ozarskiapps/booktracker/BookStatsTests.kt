@@ -3,6 +3,7 @@ package ozarskiapps.booktracker
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -41,8 +42,10 @@ class BookStatsTests {
             Calendar.getInstance()
         )
 
-        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book)
-        assertEquals(10, predictedReadingTime)
+        val fakeCurrentDay = book.startDate.clone() as Calendar
+        fakeCurrentDay.add(Calendar.DAY_OF_YEAR, 1)
+        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book, fakeCurrentDay)
+        assertEquals(20, predictedReadingTime)
     }
 
     @Test
@@ -57,9 +60,17 @@ class BookStatsTests {
             Calendar.getInstance()
         )
 
-        val predictedFinishDate = BookStatsDBService.getBookPredictedFinishDate(book)
+        val fakeCurrentDay = book.startDate.clone() as Calendar
+        fakeCurrentDay.add(Calendar.DAY_OF_YEAR, 1)
+        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book, fakeCurrentDay)
+        val predictedFinishDate = BookStatsDBService.getBookPredictedFinishDate(book, fakeCurrentDay)
         val finishCalendar = book.startDate.clone() as Calendar
-        finishCalendar.add(Calendar.DAY_OF_YEAR, 9)
+        if(predictedReadingTime != null){
+            finishCalendar.add(Calendar.DAY_OF_YEAR, predictedReadingTime - 1)
+        }
+        else{
+            fail()
+        }
         assertEquals(finishCalendar.timeInMillis, predictedFinishDate)
     }
 

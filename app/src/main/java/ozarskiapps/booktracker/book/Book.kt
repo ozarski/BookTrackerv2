@@ -66,6 +66,17 @@ class Book(
         }
     }
 
+    //now parameter is for testing purposes, DO NOT PASS now PARAMETER OUTSIDE OF TESTS
+    fun getDaysSinceStart(now: Calendar = Calendar.getInstance()): Int{
+        return if(bookStatus == BookStatus.Reading){
+            val startDate = setCalendar(this.startDate)
+            val dateNow = setCalendar(now, false)
+            ((dateNow.timeInMillis - startDate.timeInMillis) / (24 * 60 * 60 * 1000)).toInt() + 1
+        } else{
+            -1
+        }
+    }
+
     override fun toString(): String {
         return "Title: $title \t" +
                 "Author: $author\t" +
