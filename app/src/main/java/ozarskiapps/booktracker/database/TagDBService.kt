@@ -178,4 +178,30 @@ class TagDBService(val context: Context) : DBService(context) {
         }
         return emptyList()
     }
+
+    fun getTagsForBookID(id: Long): List<Tag>{
+        val db = this.readableDatabase
+        val projection = arrayOf(
+            DatabaseConstants.BookTagTable.TAG_ID_COLUMN
+        )
+        val selection = "${DatabaseConstants.BookTagTable.BOOK_ID_COLUMN} = ?"
+        val selectionArgs = arrayOf(id.toString())
+        val cursor = db.query(
+            DatabaseConstants.BookTagTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+        val tags = mutableListOf<Tag>()
+        while (cursor.moveToNext()) {
+            val tagID = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.TAG_ID_COLUMN))
+            val tag = getTagByID(tagID) ?: continue
+            tags.add(tag)
+        }
+        cursor.close()
+        return tags
+    }
 }

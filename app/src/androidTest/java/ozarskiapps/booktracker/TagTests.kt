@@ -399,4 +399,25 @@ class TagTests {
         assertEquals(tag.name, name)
         assertEquals(tag.color, tag.color)
     }
+
+    @Test
+    fun getTagsForBookID(){
+        val tag = Tag("Test tag", "#FFFFFF")
+        tag.id = tagDBService.addTag(tag)
+        testTagAddSuccess(tag)
+        val tag2 = Tag("Test tag 2", "#FFFFFF")
+        tag2.id = tagDBService.addTag(tag2)
+        testTagAddSuccess(tag2)
+        val bookID = 1L
+        tagDBService.assignTagToBook(tag.id, bookID)
+        tagDBService.assignTagToBook(tag2.id, bookID)
+        val tags = tagDBService.getTagsForBookID(bookID)
+        assertEquals(2, tags.size)
+        assertEquals(tag.id, tags[0].id)
+        assertEquals(tag.name, tags[0].name)
+        assertEquals(tag.color, tags[0].color)
+        assertEquals(tag2.id, tags[1].id)
+        assertEquals(tag2.name, tags[1].name)
+        assertEquals(tag2.color, tags[1].color)
+    }
 }

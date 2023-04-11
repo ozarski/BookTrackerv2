@@ -36,6 +36,6 @@ class BookDetailsActivity : ComponentActivity() {
                 )
             )
         }
-        BookDetailsActivityLayout(book = book)
+        BookDetailsActivityLayout(book = book, this)
     }
 }
