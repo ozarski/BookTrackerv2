@@ -30,7 +30,7 @@ class BookTests {
     }
 
     @Test
-    fun getBookReadingTime3Days(){
+    fun getBookReadingTimeDays(){
         val book = Book(
             "Full book title",
             "Author name",
@@ -75,5 +75,37 @@ class BookTests {
         val daysSinceStart = book.getDaysSinceStart()
 
         assertEquals(3, daysSinceStart)
+    }
+
+    @Test
+    fun getBookAveragePagesPerDay(){
+        val book = Book(
+            "Full book title",
+            "Author name",
+            100,
+            0,
+            BookStatus.Finished,
+            Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) },
+            Calendar.getInstance()
+        )
+        val averagePagesPerDay = book.getAveragePagesPerDay()
+
+        assertEquals(25.0, averagePagesPerDay, 0.01)
+    }
+
+    @Test
+    fun getBookAveragePagesPerDayFailUnfinished(){
+        val book = Book(
+            "Full book title",
+            "Author name",
+            100,
+            0,
+            BookStatus.Reading,
+            Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) },
+            Calendar.getInstance()
+        )
+        val averagePagesPerDay = book.getAveragePagesPerDay()
+
+        assertEquals(-1.0, averagePagesPerDay, 0.01)
     }
 }

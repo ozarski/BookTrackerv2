@@ -77,6 +77,19 @@ class Book(
         }
     }
 
+    fun getAveragePagesPerDay(): Double{
+        return if(bookStatus == BookStatus.Finished){
+            val readingTime = getBookReadingTimeInDays()
+            if(readingTime != -1){
+                numberOfPages.toDouble() / readingTime
+            } else{
+                -1.0
+            }
+        } else{
+            -1.0
+        }
+    }
+
     override fun toString(): String {
         return "Title: $title \t" +
                 "Author: $author\t" +
