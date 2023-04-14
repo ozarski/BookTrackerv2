@@ -1,6 +1,7 @@
 package ozarskiapps.booktracker
 
 import java.util.*
+import kotlin.math.roundToInt
 
 fun setCalendar(calendar: Calendar, dayStart: Boolean = true): Calendar {
     if(dayStart){
@@ -21,4 +22,8 @@ fun calendarFromMillis(millis: Long): Calendar{
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = millis
     return calendar
+}
+
+fun roundDouble(value: Double, multiplier: Int): Double{
+    return (value * multiplier).roundToInt() / multiplier.toDouble()
 }

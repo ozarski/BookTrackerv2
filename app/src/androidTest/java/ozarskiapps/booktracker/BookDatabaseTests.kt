@@ -40,7 +40,7 @@ class BookDatabaseTests {
             "Full book title",
             "Author name",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -66,7 +66,7 @@ class BookDatabaseTests {
             )
             assertEquals(
                 book.currentProgress,
-                cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+                cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
             )
             assertEquals(
                 book.bookStatus.toString(),
@@ -89,7 +89,7 @@ class BookDatabaseTests {
             "Full book title",
             "Author name",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
@@ -109,7 +109,7 @@ class BookDatabaseTests {
             "Full book title",
             "Author name",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -117,7 +117,7 @@ class BookDatabaseTests {
         book.id = bookDBService.addBook(book)
         book.author = "New author"
         book.bookStatus = BookStatus.Reading
-        book.currentProgress = 10
+        book.currentProgress = 10f
         bookDBService.updateBook(book)
         val cursor = bookDBService.readableDatabase.rawQuery(
             "SELECT * FROM ${DatabaseConstants.BookTable.TABLE_NAME} WHERE ${BaseColumns._ID} = ${book.id}",
@@ -128,7 +128,7 @@ class BookDatabaseTests {
             assertEquals(book.title, cursor.getString(1))
             assertEquals(book.author, cursor.getString(2))
             assertEquals(book.numberOfPages, cursor.getInt(3))
-            assertEquals(book.currentProgress, cursor.getInt(4))
+            assertEquals(book.currentProgress, cursor.getFloat(4))
             assertEquals(book.bookStatus.toString(), cursor.getString(5))
             assertEquals(book.startDate.timeInMillis, cursor.getLong(6))
             assertEquals(book.endDate.timeInMillis, cursor.getLong(7))
@@ -141,7 +141,7 @@ class BookDatabaseTests {
             "Full book title",
             "Author name",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -163,7 +163,7 @@ class BookDatabaseTests {
             "Full book title",
             "Author name",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()

@@ -161,7 +161,7 @@ class BookDBService(val context: Context) : DBService(context) {
         val numberOfPages =
             cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
         val currentProgress =
-            cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+            cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
         val bookStatus =
             BookStatus.valueOf(
                 cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN))
@@ -185,7 +185,7 @@ class BookDBService(val context: Context) : DBService(context) {
         )
     }
 
-    fun updateBookProgress(book: Book, progress: Int){
+    fun updateBookProgress(book: Book, progress: Float){
         if(book.bookStatus == BookStatus.Reading){
             book.currentProgress = progress
             updateBook(book)

@@ -12,7 +12,7 @@ object DatabaseConstants{
             "${BookTable.TITLE_COLUMN} TEXT NOT NULL," +
             "${BookTable.AUTHOR_COLUMN} TEXT NOT NULL," +
             "${BookTable.NUMBER_OF_PAGES_COLUMN} INTEGER NOT NULL," +
-            "${BookTable.CURRENT_PROGRESS_COLUMN} INTEGER," +
+            "${BookTable.CURRENT_PROGRESS_COLUMN} REAL," +
             "${BookTable.BOOK_STATUS_COLUMN} TEXT NOT NULL," +
             "${BookTable.START_DATE_COLUMN} LONG," +
             "${BookTable.END_DATE_COLUMN} LONG)"

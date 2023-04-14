@@ -22,7 +22,7 @@ import java.util.*
 class FinishedBookDetailsUI(val book: MutableState<Book>, val context: Context) {
 
     @Composable
-    fun FinishedBookLayout() {
+    fun GenerateLayout() {
         Column(
             modifier = Modifier
                 .background(Color.White)
@@ -88,7 +88,7 @@ fun FinishedBookPreview() {
                 "title",
                 "author",
                 100,
-                0,
+                0f,
                 BookStatus.Finished,
                 Calendar.getInstance(),
                 Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
@@ -96,5 +96,5 @@ fun FinishedBookPreview() {
         )
     }
 
-    FinishedBookDetailsUI(book = book, context = androidx.compose.ui.platform.LocalContext.current).FinishedBookLayout()
+    FinishedBookDetailsUI(book = book, context = androidx.compose.ui.platform.LocalContext.current).GenerateLayout()
 }

@@ -17,12 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
+import ozarskiapps.booktracker.database.BookDBService
 import java.util.*
 
-class WantToReadBookDetailsUI(val book: MutableState<Book>, val context: Context) {
+class WantToReadBookDetailsUI(val book: MutableState<Book>, val context: Context, val bookStatus: MutableState<BookStatus>) {
 
     @Composable
-    fun WantToReadBookLayout() {
+    fun GenerateLayout() {
 
         Column(
             modifier = Modifier
@@ -52,7 +53,10 @@ class WantToReadBookDetailsUI(val book: MutableState<Book>, val context: Context
             modifier = rowModifier
         ) {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    bookStatus.value = BookStatus.Reading
+                    BookDBService(context).startReadingBookToday(book.value)
+                },
                 modifier = buttonsModifier
             ) {
                 Text(text = "Start today", fontSize = 15.sp)
@@ -83,7 +87,7 @@ fun WantToReadBookLayoutPreview() {
                 "The Lord of the Rings",
                 "J.R.R. Tolkien",
                 1000,
-                0,
+                0f,
                 BookStatus.WantToRead,
                 Calendar.getInstance(),
                 Calendar.getInstance(),
@@ -91,5 +95,9 @@ fun WantToReadBookLayoutPreview() {
         )
     }
 
-    WantToReadBookDetailsUI(book, androidx.compose.ui.platform.LocalContext.current).WantToReadBookLayout()
+    val bookStatus = remember {
+        mutableStateOf(BookStatus.WantToRead)
+    }
+
+    WantToReadBookDetailsUI(book, androidx.compose.ui.platform.LocalContext.current, bookStatus).GenerateLayout()
 }

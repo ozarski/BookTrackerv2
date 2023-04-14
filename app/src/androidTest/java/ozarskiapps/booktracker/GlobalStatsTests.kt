@@ -173,7 +173,7 @@ class GlobalStatsTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -183,7 +183,7 @@ class GlobalStatsTests {
             "Book 2",
             "Author 3",
             200,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 7) },
@@ -195,7 +195,7 @@ class GlobalStatsTests {
             "Book 3",
             "Author 3",
             -400,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 7) },
@@ -213,7 +213,7 @@ class GlobalStatsTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -223,7 +223,7 @@ class GlobalStatsTests {
             "Book 2",
             "Author 2",
             200,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 7) },
@@ -235,7 +235,7 @@ class GlobalStatsTests {
             "Book 3",
             "Author 3",
             -400,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 7) },
@@ -253,7 +253,7 @@ class GlobalStatsTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 4) },
@@ -264,7 +264,7 @@ class GlobalStatsTests {
             "Book 2",
             "Author 2",
             200,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 3) },
@@ -276,7 +276,7 @@ class GlobalStatsTests {
             "Book 3",
             "Author 3",
             300,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 3) },
@@ -294,7 +294,7 @@ class GlobalStatsTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 4) },
@@ -305,7 +305,7 @@ class GlobalStatsTests {
             "Book 2",
             "Author 2",
             200,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 3) },
@@ -317,7 +317,7 @@ class GlobalStatsTests {
             "Book 3",
             "Author 3",
             -400,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 3) },
@@ -335,7 +335,7 @@ class GlobalStatsTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -345,7 +345,7 @@ class GlobalStatsTests {
             "Book 2",
             "Author 2",
             200,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.MONTH, get(Calendar.MONTH) - 1) },
@@ -357,7 +357,7 @@ class GlobalStatsTests {
             "Book 3",
             "Author 3",
             -400,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.MONTH, get(Calendar.MONTH) - 1) },

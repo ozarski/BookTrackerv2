@@ -11,7 +11,7 @@ class BookStatsDBService(val context: Context): DBService(context) {
 
     //currentDay is used for testing purposes DO NOT USE PASS THE currentDay PARAMETER OUTSIDE OF TESTS
     fun getBookPredictedReadingTime(book: Book, currentDay: Calendar = Calendar.getInstance()): Int?{
-        if(book.bookStatus != BookStatus.Reading || book.currentProgress == 0){
+        if(book.bookStatus != BookStatus.Reading || book.currentProgress == 0f){
             return null
         }
         val daysSinceStart = book.getDaysSinceStart(currentDay)

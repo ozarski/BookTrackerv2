@@ -42,7 +42,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -61,7 +61,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -80,7 +80,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -99,7 +99,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -119,7 +119,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -5) },
             Calendar.getInstance()
@@ -139,7 +139,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -159,7 +159,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -5) },
             Calendar.getInstance()
@@ -179,7 +179,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -5) },
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) }
@@ -199,7 +199,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -5) },
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) }
@@ -219,7 +219,7 @@ class BookStatusTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -228,7 +228,7 @@ class BookStatusTests {
             "Book 2",
             "Author 2",
             200,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -237,7 +237,7 @@ class BookStatusTests {
             "Book 3",
             "Author 3",
             300,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -246,7 +246,7 @@ class BookStatusTests {
             "Book 4",
             "Author 4",
             400,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance(),
             Calendar.getInstance()

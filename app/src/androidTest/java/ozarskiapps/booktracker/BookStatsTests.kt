@@ -36,7 +36,7 @@ class BookStatsTests {
             "Full book title",
             "Author name",
             100,
-            10,
+            10f,
             BookStatus.Reading,
             Calendar.getInstance().apply { set(2023, 0, 1) },
             Calendar.getInstance()
@@ -54,7 +54,7 @@ class BookStatsTests {
             "Full book title",
             "Author name",
             100,
-            10,
+            10f,
             BookStatus.Reading,
             Calendar.getInstance().apply { set(2023, 0, 1) },
             Calendar.getInstance()
@@ -80,7 +80,7 @@ class BookStatsTests {
             "Full book title",
             "Author name",
             100,
-            10,
+            10f,
             BookStatus.Finished,
             Calendar.getInstance().apply { set(2023, 0, 1) },
             Calendar.getInstance()
@@ -96,7 +96,7 @@ class BookStatsTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance().apply { set(2023, 0, 1) },
             Calendar.getInstance()

@@ -22,8 +22,17 @@ import java.util.*
 
 @Composable
 fun BookDetailsActivityLayout(book: MutableState<Book>, context: Context) {
-    if (book.value.bookStatus == BookStatus.Finished) {
-        FinishedBookDetailsUI(book = book, context = context).FinishedBookLayout()
+    val bookStatus = remember { mutableStateOf(book.value.bookStatus) }
+    when (bookStatus.value){
+        BookStatus.Finished -> {
+            FinishedBookDetailsUI(book = book, context = context).GenerateLayout()
+        }
+        BookStatus.WantToRead -> {
+            WantToReadBookDetailsUI(book = book, context = context, bookStatus = bookStatus).GenerateLayout()
+        }
+        else -> {
+            ReadingBookDetailsUI(book = book, context = context, bookStatus = bookStatus).GenerateLayout()
+        }
     }
 
 }
@@ -99,4 +108,26 @@ fun TagListAttribute(context: Context, book: MutableState<Book>) {
             Text(text = "Add")
         }
     }
+}
+
+@Composable
+@Preview
+fun BookDetailsLayoutPreview() {
+    val book = remember {
+        mutableStateOf(
+            Book(
+                "Lord of the Rings",
+                "J.R.R. Tolkien",
+                1000,
+                50f,
+                BookStatus.Reading,
+                Calendar.getInstance().apply{ add(Calendar.DAY_OF_YEAR, -1)},
+                Calendar.getInstance(),
+            )
+        )
+    }
+    BookDetailsActivityLayout(
+        book = book,
+        context = androidx.compose.ui.platform.LocalContext.current
+    )
 }

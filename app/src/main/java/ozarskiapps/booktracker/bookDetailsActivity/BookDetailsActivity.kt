@@ -28,7 +28,7 @@ class BookDetailsActivity : ComponentActivity() {
                     "The Lord of the Rings",
                     "J.R.R. Tolkien",
                     1178,
-                    0,
+                    0f,
                     BookStatus.WantToRead,
                     java.util.Calendar.getInstance(),
                     java.util.Calendar.getInstance(),

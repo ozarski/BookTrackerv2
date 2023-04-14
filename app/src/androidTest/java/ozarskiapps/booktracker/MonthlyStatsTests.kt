@@ -126,7 +126,7 @@ class MonthlyStatsTests {
             "Book 1",
             "Author 1",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.MONTH, 0) },
@@ -138,7 +138,7 @@ class MonthlyStatsTests {
             "Book 2",
             "Author 2",
             200,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.MONTH, 0) },
@@ -150,7 +150,7 @@ class MonthlyStatsTests {
             "Book 4",
             "Author 4",
             400,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.MONTH, 1) },

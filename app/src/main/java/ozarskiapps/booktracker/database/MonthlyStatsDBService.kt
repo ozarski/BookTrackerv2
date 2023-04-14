@@ -68,7 +68,7 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
         val numberOfPages =
             cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
         val currentProgress =
-            cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+            cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
         val bookStatus =
             BookStatus.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN)))
         val startDateMillis =

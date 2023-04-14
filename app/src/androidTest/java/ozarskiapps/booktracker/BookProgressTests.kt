@@ -35,16 +35,16 @@ class BookProgressTests {
             "The Lord of the Rings",
             "J.R.R. Tolkien",
             1000,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance(),
             Calendar.getInstance()
         )
         book.id = bookDBService.addBook(book)
 
-        bookDBService.updateBookProgress(book, 100)
+        bookDBService.updateBookProgress(book, 100f)
         val updatedBook = bookDBService.getBookByID(book.id)
-        assertEquals(100, updatedBook?.currentProgress)
+        assertEquals(100f, updatedBook?.currentProgress)
     }
 
     @Test
@@ -53,7 +53,7 @@ class BookProgressTests {
             "The Lord of the Rings",
             "J.R.R. Tolkien",
             1000,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -61,9 +61,9 @@ class BookProgressTests {
         val bookID = bookDBService.addBook(book)
         book.id = bookID + 1
 
-        bookDBService.updateBookProgress(book, 100)
+        bookDBService.updateBookProgress(book, 100f)
         val updatedBook = bookDBService.getBookByID(bookID)
-        assertEquals(0, updatedBook?.currentProgress)
+        assertEquals(0f, updatedBook?.currentProgress)
     }
 
     @Test
@@ -72,16 +72,16 @@ class BookProgressTests {
             "The Lord of the Rings",
             "J.R.R. Tolkien",
             1000,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance()
         )
         book.id = bookDBService.addBook(book)
 
-        bookDBService.updateBookProgress(book, 100)
+        bookDBService.updateBookProgress(book, 100f)
         val updatedBook = bookDBService.getBookByID(book.id)
-        assertEquals(0, updatedBook?.currentProgress)
+        assertEquals(0f, updatedBook?.currentProgress)
     }
 
 }

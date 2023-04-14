@@ -40,7 +40,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -86,7 +86,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -107,7 +107,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -118,7 +118,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -140,7 +140,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -165,7 +165,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -176,7 +176,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -207,7 +207,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -235,7 +235,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -246,7 +246,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -274,7 +274,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -284,7 +284,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -308,7 +308,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -318,7 +318,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -339,7 +339,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -350,7 +350,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -371,7 +371,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -383,7 +383,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -404,7 +404,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -416,7 +416,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -437,7 +437,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -448,7 +448,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -460,7 +460,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -482,7 +482,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -494,7 +494,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -506,7 +506,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -528,7 +528,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -540,7 +540,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -552,7 +552,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -574,7 +574,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -586,7 +586,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -597,7 +597,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) },
@@ -619,7 +619,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -631,7 +631,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -643,7 +643,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -666,7 +666,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -677,7 +677,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -702,7 +702,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -713,7 +713,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -724,7 +724,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) + 1) },
@@ -750,7 +750,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -761,7 +761,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -772,7 +772,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },
@@ -798,7 +798,7 @@ class ReadingTimeTests {
             "Full book title 1",
             "Author name 1",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -809,7 +809,7 @@ class ReadingTimeTests {
             "Full book title 2",
             "Author name 2",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 1) },
@@ -820,7 +820,7 @@ class ReadingTimeTests {
             "Full book title 3",
             "Author name 3",
             42,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance()
                 .apply { set(Calendar.DAY_OF_YEAR, get(Calendar.DAY_OF_YEAR) - 2) },

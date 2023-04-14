@@ -19,7 +19,7 @@ class BookTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance()
@@ -35,7 +35,7 @@ class BookTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance(),
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 2) }
@@ -51,7 +51,7 @@ class BookTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.WantToRead,
             Calendar.getInstance(),
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 2) }
@@ -67,7 +67,7 @@ class BookTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -2) },
             Calendar.getInstance()
@@ -83,7 +83,7 @@ class BookTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.Finished,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) },
             Calendar.getInstance()
@@ -99,7 +99,7 @@ class BookTests {
             "Full book title",
             "Author name",
             100,
-            0,
+            0f,
             BookStatus.Reading,
             Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -3) },
             Calendar.getInstance()
