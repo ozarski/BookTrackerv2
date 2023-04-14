@@ -191,4 +191,34 @@ class BookDBService(val context: Context) : DBService(context) {
             updateBook(book)
         }
     }
+
+    fun getAllBooks(): List<Book>{
+        val db = this.readableDatabase
+        val projection = arrayOf(
+            DatabaseConstants.BookTable.TITLE_COLUMN,
+            DatabaseConstants.BookTable.AUTHOR_COLUMN,
+            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
+            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
+            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
+            DatabaseConstants.BookTable.START_DATE_COLUMN,
+            DatabaseConstants.BookTable.END_DATE_COLUMN,
+            BaseColumns._ID
+        )
+
+        val cursor = db.query(
+            DatabaseConstants.BookTable.TABLE_NAME,
+            projection,
+            null,
+            null,
+            null,
+            null,
+            null
+        )
+
+        val bookList = mutableListOf<Book>()
+        while (cursor.moveToNext()) {
+            bookList.add(getBookFromCursor(cursor))
+        }
+        return bookList
+    }
 }
