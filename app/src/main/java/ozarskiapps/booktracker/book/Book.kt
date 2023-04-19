@@ -1,7 +1,7 @@
 package ozarskiapps.booktracker.book
 
+import ozarskiapps.booktracker.*
 import ozarskiapps.booktracker.OpenLibraryAPI.OpenLibraryAPIBook
-import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
 class Book(
@@ -31,61 +31,59 @@ class Book(
         setCalendar(startDate),
         setCalendar(endDate, false),
         -1
-    ){
-        if(bookStatus == BookStatus.WantToRead){
+    ) {
+        if (bookStatus == BookStatus.WantToRead) {
             this.startDate.timeInMillis = 0
             this.endDate.timeInMillis = 0
-        }
-        else if(bookStatus == BookStatus.Reading){
+        } else if (bookStatus == BookStatus.Reading) {
             this.endDate.timeInMillis = 0
-        }
-        else if (bookStatus == BookStatus.Finished){
-            if(this.startDate.timeInMillis > this.endDate.timeInMillis){
+        } else if (bookStatus == BookStatus.Finished) {
+            if (this.startDate.timeInMillis > this.endDate.timeInMillis) {
                 this.endDate.timeInMillis = this.startDate.timeInMillis
             }
         }
     }
 
-    constructor(bookData: OpenLibraryAPIBook): this(
+    constructor(bookData: OpenLibraryAPIBook) : this(
         bookData.title,
         bookData.authorsToString(),
         bookData.numberOfPagesMedian,
         0f,
         BookStatus.WantToRead,
-        Calendar.getInstance().apply{ timeInMillis = 0L },
-        Calendar.getInstance().apply{ timeInMillis = 0L }
+        Calendar.getInstance().apply { timeInMillis = 0L },
+        Calendar.getInstance().apply { timeInMillis = 0L }
     )
 
-    fun getBookReadingTimeInDays(): Int{
-        return if(bookStatus == BookStatus.Finished){
+    fun getBookReadingTimeInDays(): Int {
+        return if (bookStatus == BookStatus.Finished) {
             val startDate = setCalendar(this.startDate)
             val endDate = setCalendar(this.endDate, false)
-            ((endDate.timeInMillis - startDate.timeInMillis) / (24 * 60 * 60 * 1000)).toInt() + 1
-        } else{
+            daysBetweenDates(startDate, endDate)
+        } else {
             -1
         }
     }
 
     //now parameter is for testing purposes, DO NOT PASS now PARAMETER OUTSIDE OF TESTS
-    fun getDaysSinceStart(now: Calendar = Calendar.getInstance()): Int{
-        return if(bookStatus == BookStatus.Reading){
+    fun getDaysSinceStart(now: Calendar = Calendar.getInstance()): Int {
+        return if (bookStatus == BookStatus.Reading) {
             val startDate = setCalendar(this.startDate)
             val dateNow = setCalendar(now, false)
-            ((dateNow.timeInMillis - startDate.timeInMillis) / (24 * 60 * 60 * 1000)).toInt() + 1
-        } else{
+            daysBetweenDates(startDate, dateNow)
+        } else {
             -1
         }
     }
 
-    fun getAveragePagesPerDay(): Double{
-        return if(bookStatus == BookStatus.Finished){
+    fun getAveragePagesPerDay(): Double {
+        return if (bookStatus == BookStatus.Finished) {
             val readingTime = getBookReadingTimeInDays()
-            if(readingTime != -1){
+            if (readingTime != -1) {
                 numberOfPages.toDouble() / readingTime
-            } else{
+            } else {
                 -1.0
             }
-        } else{
+        } else {
             -1.0
         }
     }

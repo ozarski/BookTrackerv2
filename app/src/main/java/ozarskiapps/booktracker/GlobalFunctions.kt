@@ -4,7 +4,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 fun setCalendar(calendar: Calendar, dayStart: Boolean = true): Calendar {
-    if(dayStart){
+    if (dayStart) {
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)
@@ -18,12 +18,17 @@ fun setCalendar(calendar: Calendar, dayStart: Boolean = true): Calendar {
     return calendar
 }
 
-fun calendarFromMillis(millis: Long): Calendar{
+fun calendarFromMillis(millis: Long): Calendar {
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = millis
     return calendar
 }
 
-fun roundDouble(value: Double, multiplier: Int): Double{
+fun roundDouble(value: Double, multiplier: Int): Double {
     return (value * multiplier).roundToInt() / multiplier.toDouble()
+
+}
+
+fun daysBetweenDates(start: Calendar, end: Calendar): Int {
+    return ((end.timeInMillis - start.timeInMillis) / MILLISECONDS_IN_DAY).toInt() + 1
 }
