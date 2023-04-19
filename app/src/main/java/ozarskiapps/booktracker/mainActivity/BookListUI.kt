@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,12 +20,13 @@ import androidx.compose.ui.unit.sp
 import ozarskiapps.booktracker.book.Book
 
 @Composable
-fun BookListLazyColumn(bookList: List<Book>){
+fun BookListLazyColumn(bookList: SnapshotStateList<List<Book>>){
     LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp),
     modifier = Modifier.fillMaxSize()){
         items(bookList.size){
-            BookItemRow(bookList[it])
+            val item = bookList[0][it]
+            BookItemRow(book = item)
         }
     }
 }

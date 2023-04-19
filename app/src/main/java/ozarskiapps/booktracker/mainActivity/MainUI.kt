@@ -1,5 +1,6 @@
 package ozarskiapps.booktracker.mainActivity
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,13 +22,13 @@ import kotlinx.coroutines.launch
 import ozarskiapps.booktracker.mainActivity.statsTab.StatsTabbedLayout
 
 @Composable
-fun LayoutMain(){
-    LayoutMainTabs()
+fun LayoutMain(context: Context){
+    LayoutMainTabs(context)
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun LayoutMainTabs(){
+fun LayoutMainTabs(context: Context){
     val tabIndex = remember { mutableStateOf(0) }
     val tabs = listOf("Books", "Stats")
 
@@ -57,7 +58,7 @@ fun LayoutMainTabs(){
         }
         HorizontalPager(state = pagerState, count = tabs.size) {
             when(it){
-                0 -> LayoutMainBooks()
+                0 -> LayoutMainBooks(context)
                 1 -> StatsTabbedLayout()
             }
         }

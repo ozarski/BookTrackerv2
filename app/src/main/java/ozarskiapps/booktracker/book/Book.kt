@@ -96,8 +96,8 @@ class Book(
                 "Number of pages: $numberOfPages\t" +
                 "Current progress: $currentProgress\t" +
                 "Book status: $bookStatus\t" +
-                "Start date: $startDate\t" +
-                "End date: $endDate\t" +
+                "Start date: ${startDate.time}\t" +
+                "End date: ${endDate.time}\t" +
                 "ID: $id"
     }
 }

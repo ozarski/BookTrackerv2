@@ -18,17 +18,7 @@ class AddActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent{
-            AddLayout(context = this)
+            AddActivityUI(this).GenerateLayout()
         }
     }
-}
-
-@Composable
-private fun AddLayout(context: Context){
-    val bookTitle = remember { mutableStateOf(TextFieldValue("")) }
-    val bookAuthor = remember { mutableStateOf(TextFieldValue("")) }
-    val bookNumberOfPages = remember { mutableStateOf(TextFieldValue("")) }
-    val startDate = remember { mutableStateOf(Calendar.getInstance()) }
-    val endDate = remember { mutableStateOf(Calendar.getInstance()) }
-    BookAddActivityLayout(title = bookTitle, author = bookAuthor, numberOfPages = bookNumberOfPages, startDate = startDate, endDate = endDate)
 }

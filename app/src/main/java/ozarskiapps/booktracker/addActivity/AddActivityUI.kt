@@ -1,5 +1,9 @@
 package ozarskiapps.booktracker.addActivity
 
+import android.app.DatePickerDialog
+import android.content.Context
+import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
@@ -9,30 +13,49 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import java.text.SimpleDateFormat
 import java.util.*
 
-@Composable
-fun BookAddActivityLayout(
-    title: MutableState<TextFieldValue>,
-    author: MutableState<TextFieldValue>,
-    numberOfPages: MutableState<TextFieldValue>,
-    startDate: MutableState<Calendar>,
-    endDate: MutableState<Calendar>
-) {
+class AddActivityUI(val context: Context) {
+    private lateinit var title: MutableState<TextFieldValue>
+    private lateinit var author: MutableState<TextFieldValue>
+    private lateinit var numberOfPages: MutableState<TextFieldValue>
+    private lateinit var startDate: MutableState<Calendar>
+    private lateinit var endDate: MutableState<Calendar>
+    private lateinit var selectedOption: MutableState<String>
 
-    val selectedOption = remember { mutableStateOf("Reading") }
+    @Composable
+    fun GenerateLayout() {
 
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-            .padding(top = 10.dp)
-            .fillMaxSize()
-    ) {
+        selectedOption = remember { mutableStateOf("Reading") }
+        title = remember { mutableStateOf(TextFieldValue("")) }
+        author = remember { mutableStateOf(TextFieldValue("")) }
+        numberOfPages = remember { mutableStateOf(TextFieldValue("")) }
+        startDate = remember { mutableStateOf(Calendar.getInstance()) }
+        endDate = remember { mutableStateOf(Calendar.getInstance()) }
 
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(top = 10.dp)
+                .fillMaxSize()
+        ) {
+            BookFieldsColumn()
+            AddButton(context)
+        }
+
+    }
+
+
+    @Composable
+    fun BookFieldsColumn() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -41,147 +64,213 @@ fun BookAddActivityLayout(
 
             TextFieldRow(placeholder = "Book title", label = "Title", text = title)
             TextFieldRow(placeholder = "Book author", label = "Author", text = author)
+
             NumberTextFieldRow(
                 placeholder = "Number of pages",
                 label = "Number of pages",
                 text = numberOfPages
             )
+
             StatusRadioButtons(selectedOption.value) { option -> selectedOption.value = option }
             if (selectedOption.value == "Finished") {
-
                 Text(text = "Start date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
-                JetpackDatePicker(selectedDate = startDate)
+                DateRow(
+                    date = startDate,
+                    context = LocalContext.current,
+                    maxDate = endDate.value,
+                    text = "Start date: "
+                )
                 Text(text = "End date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
-                JetpackDatePicker(selectedDate = endDate)
+                DateRow(
+                    date = endDate,
+                    context = LocalContext.current,
+                    minDate = startDate.value,
+                    text = "End date: "
+                )
             } else if (selectedOption.value == "Reading") {
-
                 Text(text = "Start date", modifier = Modifier.padding(start = 16.dp, top = 10.dp))
-                JetpackDatePicker(selectedDate = startDate)
+                DateRow(date = startDate, context = LocalContext.current)
             }
         }
-        AddButton()
     }
 
-}
-
-@Composable
-fun TextFieldRow(placeholder: String, label: String, text: MutableState<TextFieldValue>) {
-    Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = text.value,
-            onValueChange = { newText ->
-                text.value = newText
-            },
-            label = { Text(text = label) },
-            placeholder = { Text(text = placeholder) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Gray
-            ),
-            modifier = Modifier
-                .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
-                .fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-fun NumberTextFieldRow(placeholder: String, label: String, text: MutableState<TextFieldValue>) {
-    Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = text.value,
-            onValueChange = { newText ->
-                text.value = newText
-            },
-            label = { Text(text = label) },
-            placeholder = { Text(text = placeholder) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Gray
-            ),
-            modifier = Modifier
-                .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
-                .fillMaxWidth()
-        )
-    }
-
-}
-
-@Composable
-fun StatusRadioButtons(selectedOption: String, onOptionSelected: (String) -> Unit) {
-    val radioOptions = listOf("Reading", "Finished", "Want to read")
-    //val option = remember { mutableStateOf(radioOptions[0]) }
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-        // below line is use to set data to
-        // each radio button in columns.
-        radioOptions.forEach { text ->
-            StatusRadioButton(text = text, selectedOption = selectedOption, onOptionSelected)
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun StatusRadioButton(
-    text: String,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
-) {
-    Column(
-        Modifier
-            .selectable(
-                // this method is called when
-                // radio button is selected.
-                selected = (text == selectedOption),
-                // below method is called on
-                // clicking of radio button.
-                onClick = {
-                    onOptionSelected(text)
-                }
-            )
+    @Composable
+    fun DateRow(
+        date: MutableState<Calendar>,
+        context: Context,
+        maxDate: Calendar = Calendar.getInstance().apply { add(Calendar.YEAR, 100) },
+        minDate: Calendar = Calendar.getInstance().apply { add(Calendar.YEAR, -100) },
+        text: String = "Date: "
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(
-                selected = (text == selectedOption),
-                onClick = {
-                    // inside on click method we are setting a
-                    // selected option of our radio buttons.
-                    onOptionSelected(text)
-                }
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
+            val formattedDate = sdf.format(date.value.time)
             Text(
-                text = text,
+                text = "$text $formattedDate",
+                modifier = Modifier.padding(start = 16.dp, top = 10.dp),
+                textAlign = TextAlign.Start,
+                fontSize = 25.sp
+            )
+            Button(onClick = {
+                showDatePickerDialog(date, context, maxDate, minDate)
+            }) {
+                Text(text = "Change")
+            }
+        }
+    }
+
+    private fun showDatePickerDialog(
+        date: MutableState<Calendar>,
+        context: Context,
+        maxDate: Calendar,
+        minDate: Calendar
+    ) {
+        val datePickerDialog = DatePickerDialog(
+            context,
+            { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                date.value = Calendar
+                    .getInstance()
+                    .apply {
+                        set(Calendar.YEAR, year)
+                        set(Calendar.MONTH, month)
+                        set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    }
+            },
+            date.value.get(Calendar.YEAR),
+            date.value.get(Calendar.MONTH),
+            date.value.get(Calendar.DAY_OF_MONTH)
+        )
+        datePickerDialog.datePicker.maxDate = maxDate.timeInMillis
+        datePickerDialog.datePicker.minDate = minDate.timeInMillis
+        datePickerDialog.show()
+    }
+
+    @Composable
+    fun TextFieldRow(placeholder: String, label: String, text: MutableState<TextFieldValue>) {
+
+        Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = text.value,
+                onValueChange = { newText ->
+                    text.value = newText
+                },
+                label = { Text(text = label) },
+                placeholder = { Text(text = placeholder) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Gray
+                ),
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
+                    .fillMaxWidth()
             )
         }
     }
-}
 
+    @Composable
+    fun NumberTextFieldRow(placeholder: String, label: String, text: MutableState<TextFieldValue>) {
+        Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = text.value,
+                onValueChange = { newText ->
+                    text.value = newText
+                },
+                label = { Text(text = label) },
+                placeholder = { Text(text = placeholder) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Gray
+                ),
+                modifier = Modifier
+                    .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
 
-@Composable
-fun AddButton() {
-    Button(
-        onClick = { /*TODO*/ }, modifier = Modifier
-            .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
-            .fillMaxWidth()
+    }
+
+    @Composable
+    fun StatusRadioButtons(selectedOption: String, onOptionSelected: (String) -> Unit) {
+        val radioOptions = listOf("Reading", "Finished", "Want to read")
+
+        Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+            // below line is used to create each radio button
+            radioOptions.forEach { text ->
+                StatusRadioButtonColumn(
+                    text = text,
+                    selectedOption = selectedOption,
+                    onOptionSelected
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun StatusRadioButtonColumn(
+        text: String,
+        selectedOption: String,
+        onOptionSelected: (String) -> Unit
     ) {
-        Text(text = "Add")
+        Column(
+            Modifier
+                .selectable(
+                    // this method is called when
+                    // radio button is selected.
+                    selected = (text == selectedOption),
+                    // below method is called on
+                    // clicking of radio button.
+                    onClick = {
+                        onOptionSelected(text)
+                    }
+                )
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = (text == selectedOption),
+                    onClick = {
+                        onOptionSelected(text)
+                    }
+                )
+                Text(
+                    text = text,
+                )
+            }
+        }
+    }
+
+    private fun checkFields(): Boolean {
+        if (title.value.text == "" || author.value.text == "" || numberOfPages.value.text == "")
+            return false
+        else if (startDate.value.timeInMillis > endDate.value.timeInMillis && selectedOption.value == "Finished")
+            return false
+        return true
+    }
+
+    @Composable
+    fun AddButton(context: Context) {
+        Button(
+            onClick = {
+                if (!checkFields()) {
+                    Toast.makeText(context, "Invalid values", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier
+                .padding(start = 16.dp, bottom = 10.dp, end = 16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Add")
+        }
     }
 }
-
 
 @Preview
 @Composable
-fun BookAddActivityLayoutPreview() {
-    val bookTitle = remember { mutableStateOf(TextFieldValue("")) }
-    val bookAuthor = remember { mutableStateOf(TextFieldValue("")) }
-    val bookNumberOfPages = remember { mutableStateOf(TextFieldValue("")) }
-    BookAddActivityLayout(
-        bookTitle,
-        bookAuthor,
-        bookNumberOfPages,
-        remember { mutableStateOf(Calendar.getInstance()) },
-        remember { mutableStateOf(Calendar.getInstance()) }
-    )
+fun AddBookPreview() {
+    AddActivityUI(LocalContext.current).GenerateLayout()
 }

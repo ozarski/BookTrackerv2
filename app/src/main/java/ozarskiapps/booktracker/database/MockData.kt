@@ -10,7 +10,12 @@ import java.util.*
 
 class MockData(val context: Context): DBService(context) {
 
-    fun addMockBooks(){
+    fun generateMockData(){
+        addMockBooks()
+        addMockTags()
+    }
+
+    private fun addMockBooks(){
         val bookDBService = BookDBService(context)
 
 
@@ -29,7 +34,7 @@ class MockData(val context: Context): DBService(context) {
 
     }
 
-    fun addMockTags(){
+    private fun addMockTags(){
         val tagColors = listOf(
             Color(0xFFE57373),
             Color(0xFFF06292),

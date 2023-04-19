@@ -9,7 +9,7 @@ import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.calendarFromMillis
 import java.util.*
 
-class BookDBService(val context: Context) : DBService(context) {
+class BookDBService(private val context: Context) : DBService(context) {
 
     fun addBook(book: Book): Long {
         val db = this.writableDatabase
@@ -151,7 +151,7 @@ class BookDBService(val context: Context) : DBService(context) {
         }
     }
 
-    fun getBookFromCursor(cursor: Cursor): Book{
+    private fun getBookFromCursor(cursor: Cursor): Book{
 
         val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
         val title =
@@ -217,6 +217,35 @@ class BookDBService(val context: Context) : DBService(context) {
 
         val bookList = mutableListOf<Book>()
         while (cursor.moveToNext()) {
+            bookList.add(getBookFromCursor(cursor))
+        }
+        return bookList
+    }
+
+    fun getBooksWithIDs(ids: List<Long>): List<Book>{
+        val db = this.readableDatabase
+        val projection = arrayOf(
+            DatabaseConstants.BookTable.TITLE_COLUMN,
+            DatabaseConstants.BookTable.AUTHOR_COLUMN,
+            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
+            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
+            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
+            DatabaseConstants.BookTable.START_DATE_COLUMN,
+            DatabaseConstants.BookTable.END_DATE_COLUMN,
+            BaseColumns._ID
+        )
+        val selection = "${BaseColumns._ID} IN (${ids.joinToString(",")})"
+        val cursor = db.query(
+            DatabaseConstants.BookTable.TABLE_NAME,
+            projection,
+            selection,
+            null,
+            null,
+            null,
+            null
+        )
+        val bookList = mutableListOf<Book>()
+        while(cursor.moveToNext()){
             bookList.add(getBookFromCursor(cursor))
         }
         return bookList

@@ -4,8 +4,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-open class DBService(context: Context) : SQLiteOpenHelper(
-    context,
+open class DBService(val appContext: Context) : SQLiteOpenHelper(
+    appContext,
     DatabaseConstants.DATABASE_NAME,
     null,
     DatabaseConstants.DATABASE_VERSION
@@ -37,5 +37,9 @@ open class DBService(context: Context) : SQLiteOpenHelper(
 
     private fun createBookTagTable(db: SQLiteDatabase){
         db.execSQL(DatabaseConstants.BOOK_TAG_TABLE_CREATE_QUERY)
+    }
+
+    fun dropDatabase(){
+        appContext.deleteDatabase(DatabaseConstants.DATABASE_NAME)
     }
 }

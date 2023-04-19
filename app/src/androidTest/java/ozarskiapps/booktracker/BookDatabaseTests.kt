@@ -186,4 +186,51 @@ class BookDatabaseTests {
         assertNull(bookFromDB)
     }
 
+    @Test
+    fun getBooksByIDs(){
+
+        val book = Book(
+            "Full book title 1",
+            "Author name",
+            42,
+            0f,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+        )
+        book.id = bookDBService.addBook(book)
+        val book2 = Book(
+            "Full book title 2",
+            "Author name",
+            42,
+            0f,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+        )
+        book2.id = bookDBService.addBook(book2)
+        val book3 = Book(
+            "Full book title 3",
+            "Author name",
+            42,
+            0f,
+            BookStatus.Finished,
+            Calendar.getInstance(),
+            Calendar.getInstance()
+        )
+        book3.id = bookDBService.addBook(book3)
+
+        val books = bookDBService.getBooksWithIDs(listOf(book.id, book2.id))
+        assertEquals(2, books.size)
+        println(books[0].toString())
+        println(books[1].toString())
+        assertEquals(book.toString(), books[0].toString())
+        assertEquals(book2.toString(), books[1].toString())
+    }
+
+    fun getBooksByIDsFailNoBooksWithIDs(){
+        val books = bookDBService.getBooksWithIDs(listOf(1, 2))
+        assertEquals(0, books.size)
+    }
+
 }
