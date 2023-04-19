@@ -22,21 +22,33 @@ import ozarskiapps.booktracker.roundDouble
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReadingBookDetailsUI(val book: MutableState<Book>, val context: Context, val bookStatus: MutableState<BookStatus>) {
+class ReadingBookDetailsLayout(
+    book: MutableState<Book>,
+    context: Context,
+    val bookStatus: MutableState<BookStatus>
+) : BookDetailsUI(book, context) {
 
     @Composable
-    fun GenerateLayout() {
+    override fun GenerateLayout() {
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .padding(top = 10.dp)
                 .fillMaxWidth()
         ) {
-            BookAttribute(labelText = "Book title", text = book.value.title)
-            BookAttribute(labelText = "Book author", text = book.value.author)
-            BookAttribute(labelText = "Number of pages", text = book.value.numberOfPages.toString())
+
+            BookAttribute(labelText = "Book title", valueText = book.value.title)
+            BookAttribute(labelText = "Book author", valueText = book.value.author)
+            BookAttribute(
+                labelText = "Number of pages",
+                valueText = book.value.numberOfPages.toString()
+            )
+
             val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
-            BookAttribute(labelText = "Start date", text = sdf.format(book.value.startDate.time))
+            BookAttribute(
+                labelText = "Start date",
+                valueText = sdf.format(book.value.startDate.time)
+            )
 
             BookProgressSection()
 
@@ -94,14 +106,14 @@ class ReadingBookDetailsUI(val book: MutableState<Book>, val context: Context, v
     @Composable
     fun BookProgressIndicator(progressValue: MutableState<Float>) {
         Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "Progress",
                 modifier = Modifier.padding(start = 16.dp, top = 10.dp),
                 fontSize = 20.sp
             )
         }
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "${progressValue.value.toInt()} pages",
                 modifier = Modifier.padding(start = 16.dp),
                 fontSize = 25.sp
@@ -111,7 +123,7 @@ class ReadingBookDetailsUI(val book: MutableState<Book>, val context: Context, v
 
     @Composable
     fun BookProgressSlider(progressValue: MutableState<Float>) {
-        Row() {
+        Row {
             Slider(
                 value = progressValue.value,
                 onValueChange = {
@@ -135,49 +147,48 @@ class ReadingBookDetailsUI(val book: MutableState<Book>, val context: Context, v
     }
 
     @Composable
-    fun BookProgressStats(progressValue: MutableState<Float>) {
-        val percentage = (progressValue.value / book.value.numberOfPages.toFloat()) * 100
-        val percentageRounded = roundDouble(percentage.toDouble(), 10)
-        Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Completion: ${percentageRounded}%",
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 20.sp
-            )
-        }
+    fun ProgressValueTextRow(text: String) {
 
-        val estimatedReadingTime =
-            BookStatsDBService(context).getBookPredictedReadingTime(book.value)
-        val daysLeft =
-            if (estimatedReadingTime != null) estimatedReadingTime - book.value.getDaysSinceStart() else null
         Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = if (estimatedReadingTime != null)
-                    "Estimated reading time: $estimatedReadingTime days ($daysLeft left)"
-                else
-                    "Estimated reading time: -",
-                modifier = Modifier.padding(start = 16.dp),
-                fontSize = 20.sp
-            )
-        }
-
-        val estimatedFinishDate = BookStatsDBService(context).getBookPredictedFinishDate(book.value)
-        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
-        var estimatedFinishDateText = ""
-        estimatedFinishDateText += if(estimatedFinishDate != 0L){
-            sdf.format(estimatedFinishDate)
-        } else {
-            "-"
-        }
-        Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Estimated finish date: $estimatedFinishDateText",
+                text = text,
                 modifier = Modifier.padding(start = 16.dp),
                 fontSize = 20.sp
             )
         }
     }
 
+    @Composable
+    fun BookProgressStats(progressValue: MutableState<Float>) {
+        val percentage = (progressValue.value / book.value.numberOfPages.toFloat()) * 100
+        val percentageRounded = roundDouble(percentage.toDouble(), 10)
+        ProgressValueTextRow(text = "Completion: $percentageRounded%")
+
+        val estimatedReadingTime =
+            BookStatsDBService(context).getBookPredictedReadingTime(book.value)
+        val daysLeft =
+            if (estimatedReadingTime != null) estimatedReadingTime - book.value.getDaysSinceStart() else null
+        ProgressValueTextRow(
+            text = if (estimatedReadingTime != null)
+                "Estimated reading time: $estimatedReadingTime days ($daysLeft left)"
+            else
+                "Estimated reading time: -"
+        )
+
+        val estimatedFinishDate = BookStatsDBService(context).getBookPredictedFinishDate(book.value)
+        val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
+        val estimatedFinishDateText = if (estimatedFinishDate != 0L) {
+            sdf.format(estimatedFinishDate)
+        } else {
+            "-"
+        }
+        ProgressValueTextRow(
+            text = if (estimatedFinishDate != 0L)
+                "Estimated finish date: $estimatedFinishDateText"
+            else
+                "Estimated finish date: -"
+        )
+    }
 }
 
 @Preview
@@ -198,7 +209,7 @@ fun ReadingBookLayoutPreview() {
     }
 
     val bookStatus = remember { mutableStateOf(BookStatus.Reading) }
-    ReadingBookDetailsUI(
+    ReadingBookDetailsLayout(
         book = book,
         context = androidx.compose.ui.platform.LocalContext.current,
         bookStatus = bookStatus

@@ -14,49 +14,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
-import java.text.SimpleDateFormat
+import ozarskiapps.booktracker.database.BookDBService
 import java.util.*
 
-class FinishedBookDetailsUI(val book: MutableState<Book>, val context: Context) {
+class WantToReadBookDetailsLayout(
+    book: MutableState<Book>,
+    context: Context,
+    val bookStatus: MutableState<BookStatus>
+) : BookDetailsUI(book, context) {
 
     @Composable
-    fun GenerateLayout() {
+    override fun GenerateLayout() {
         Column(
             modifier = Modifier
                 .background(Color.White)
                 .padding(top = 10.dp)
                 .fillMaxWidth()
         ) {
-            BookAttribute(labelText = "Book title", text = book.value.title)
-            BookAttribute(labelText = "Book author", text = book.value.author)
-            BookAttribute(labelText = "Number of pages", text = book.value.numberOfPages.toString())
-            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
-            BookAttribute(labelText = "Start date", text = sdf.format(book.value.startDate.time))
-            BookAttribute(labelText = "End date", text = sdf.format(book.value.endDate.time))
-            BookAttribute(
-                labelText = "Reading time",
-                text = book.value.getBookReadingTimeInDays().toString()
-            )
-            BookAttribute(
-                labelText = "Average pages per day",
-                text = book.value.getAveragePagesPerDay().toString()
-            )
+
+            BookAttribute(labelText = "Book title", valueText = book.value.title)
+            BookAttribute(labelText = "Book author", valueText = book.value.author)
+            BookAttribute(labelText = "Number of pages", valueText = book.value.numberOfPages.toString())
+
             TagListAttribute(context = context, book = book)
 
             val rowModifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
             val buttonsModifier = Modifier
-                .padding(start = 16.dp, bottom = 10.dp, end = 10.dp)
-                .weight(0.5f)
-            EditDeleteButtons(rowModifier = rowModifier, buttonsModifier = buttonsModifier)
+                .padding(start = 7.dp, bottom = 10.dp, end = 7.dp)
+                .weight(0.3f)
+            WantToReadBookUIButtons(rowModifier = rowModifier, buttonsModifier = buttonsModifier)
         }
     }
 
     @Composable
-    fun EditDeleteButtons(rowModifier: Modifier, buttonsModifier: Modifier) {
+    fun WantToReadBookUIButtons(rowModifier: Modifier, buttonsModifier: Modifier) {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Bottom,
@@ -64,37 +60,54 @@ class FinishedBookDetailsUI(val book: MutableState<Book>, val context: Context) 
         ) {
             Button(
                 onClick = {
+                    bookStatus.value = BookStatus.Reading
+                    BookDBService(context).startReadingBookToday(book.value)
                 },
                 modifier = buttonsModifier
             ) {
-                Text(text = "Edit")
+                Text(text = "Start today", fontSize = 15.sp)
             }
             Button(
                 onClick = { /*TODO*/ },
                 modifier = buttonsModifier
             ) {
-                Text(text = "Delete")
+                Text(text = "Edit", fontSize = 15.sp)
+            }
+            Button(
+                onClick = { /*TODO*/ },
+                modifier = buttonsModifier
+            ) {
+                Text(text = "Delete", fontSize = 15.sp)
             }
         }
     }
 }
 
+
 @Composable
 @Preview
-fun FinishedBookPreview() {
+fun WantToReadBookLayoutPreview() {
     val book = remember {
         mutableStateOf(
             Book(
-                "title",
-                "author",
-                100,
+                "The Lord of the Rings",
+                "J.R.R. Tolkien",
+                1000,
                 0f,
-                BookStatus.Finished,
+                BookStatus.WantToRead,
                 Calendar.getInstance(),
-                Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
+                Calendar.getInstance(),
             )
         )
     }
 
-    FinishedBookDetailsUI(book = book, context = androidx.compose.ui.platform.LocalContext.current).GenerateLayout()
+    val bookStatus = remember {
+        mutableStateOf(BookStatus.WantToRead)
+    }
+
+    WantToReadBookDetailsLayout(
+        book,
+        androidx.compose.ui.platform.LocalContext.current,
+        bookStatus
+    ).GenerateLayout()
 }
