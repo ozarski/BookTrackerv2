@@ -19,49 +19,56 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ozarskiapps.booktracker.book.Book
 
-@Composable
-fun BookListLazyColumn(bookList: SnapshotStateList<List<Book>>){
-    LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    modifier = Modifier.fillMaxSize()){
-        items(bookList.size){
-            val item = bookList[0][it]
-            BookItemRow(book = item)
+class BookListUI(val bookList: SnapshotStateList<List<Book>>) {
+
+    @Composable
+    fun GenerateLayout(){
+        BookListLazyColumn()
+    }
+    @Composable
+    private fun BookListLazyColumn(){
+        LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxSize()){
+            items(bookList.size){
+                val item = bookList[0][it]
+                BookItemRow(book = item)
+            }
         }
     }
-}
 
-@Composable
-fun BookItemRow(book: Book){
-    Row(
-        modifier = Modifier.fillMaxWidth()
-            .height(75.dp)
-            .background(Color.White)
-            .padding(3.dp)
-            .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(5.dp))
-            .clickable { println(book.toString()) },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ){
-        Text(
-            text = book.title,
-            modifier = Modifier
-                .weight(0.7f)
-                .padding(10.dp),
-            fontSize = 16.sp,
-            textAlign = TextAlign.Start,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = book.author,
-            modifier = Modifier
-                .weight(0.3f)
-                .padding(10.dp),
-            fontSize = 16.sp,
-            textAlign = TextAlign.Start,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
+    @Composable
+    private fun BookItemRow(book: Book){
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .height(75.dp)
+                .background(Color.White)
+                .padding(3.dp)
+                .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(5.dp))
+                .clickable { println(book.toString()) },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ){
+            Text(
+                text = book.title,
+                modifier = Modifier
+                    .weight(0.7f)
+                    .padding(10.dp),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = book.author,
+                modifier = Modifier
+                    .weight(0.3f)
+                    .padding(10.dp),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }

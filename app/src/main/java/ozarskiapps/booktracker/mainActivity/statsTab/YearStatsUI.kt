@@ -18,94 +18,70 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import java.util.*
 
-@Composable
-fun YearStatsLayout() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.White)
-        .padding(top = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top) {
+class YearStatsUI : StatsTabUI() {
 
+    @Composable
+    override fun GenerateLayout() {
+        YearStatsLayout()
+    }
+
+    @Composable
+    fun YearStatsLayout() {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(top = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top) {
+
+
+            DateButton(Calendar.getInstance())
+            TotalPagesText(23456)
+
+            StatRow(
+                stat1Name = "books read",
+                stat1Value = "8",
+                stat2Name = "pages per day",
+                stat2Value = "42"
+            )
+            StatRow(
+                stat1Name = "pages per book",
+                stat1Value = "315.1",
+                stat2Name = "days per book",
+                stat2Value = "7.5"
+            )
+            StatRow(
+                stat1Name = "books will be read with current pace",
+                stat1Value = "40",
+                stat2Name = "books per month",
+                stat2Value = "0.7"
+            )
+            StatRow(
+                stat1Name = "books per week",
+                stat1Value = "0.9",
+                stat2Name = "year progress",
+                stat2Value = "19.8%"
+            )
+        }
+    }
+
+    @Composable
+    private fun DateButton(calendar: Calendar){
         Button (onClick = {  /*TODO("Open year picker dialog")*/ },
             colors = ButtonDefaults.buttonColors( containerColor = Color.Transparent),
             modifier = Modifier
-            .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(12.dp))
+                .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(12.dp))
         ){
-            Text(text = "2023", fontSize = 25.sp, color = Color.Black)
+            val year = calendar.get(Calendar.YEAR).toString()
+            Text(text = year, fontSize = 25.sp, color = Color.Black)
         }
-
-        Text(
-            text = "32862",
-            fontSize = 35.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 10.dp)
-        )
-        Text(
-            text = "pages read",
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 10.dp)
-        )
-
-        StatRow(
-            stat1Name = "books read",
-            stat1Value = "8",
-            stat2Name = "pages per day",
-            stat2Value = "42"
-        )
-        StatRow(
-            stat1Name = "pages per book",
-            stat1Value = "315.1",
-            stat2Name = "days per book",
-            stat2Value = "7.5"
-        )
-        StatRow(
-            stat1Name = "books will be read with current pace",
-            stat1Value = "40",
-            stat2Name = "books per month",
-            stat2Value = "0.7"
-        )
-        StatRow(
-            stat1Name = "books per week",
-            stat1Value = "0.9",
-            stat2Name = "year progress",
-            stat2Value = "19.8%"
-        )
     }
-}
 
-@Preview
-@Composable
-fun YearStatsLayoutPreview() {
-    YearStatsLayout()
-}
-
-@Preview
-@Composable
-fun NumberPickerPreview(){
-    AndroidView(
-        modifier = Modifier.fillMaxWidth(),
-        factory = { context ->
-            NumberPicker(context).apply {
-                setOnValueChangedListener { numberPicker, i, i2 ->  }
-                minValue = 0
-                maxValue = 11
-                wrapSelectorWheel = true
-                displayedValues = arrayOf("January",
-                    "February",
-                    "March",
-                    "April",
-                    "May",
-                    "June",
-                    "July",
-                    "August",
-                    "September",
-                    "October",
-                    "November",
-                    "December")
-            }
-        }
-    )
+    @Preview
+    @Composable
+    fun YearStatsLayoutPreview() {
+        YearStatsLayout()
+    }
 }

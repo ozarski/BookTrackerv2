@@ -8,58 +8,77 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ozarskiapps.booktracker.mainActivity.statsTab.StatsTabbedLayout
+import ozarskiapps.booktracker.R
+import ozarskiapps.booktracker.mainActivity.statsTab.MainStatsUI
 
-@Composable
-fun LayoutMain(context: Context){
-    LayoutMainTabs(context)
-}
 
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun LayoutMainTabs(context: Context){
-    val tabIndex = remember { mutableStateOf(0) }
-    val tabs = listOf("Books", "Stats")
+class MainUI(val context: Context) {
 
-    val pagerState = rememberPagerState()
-    val scope = rememberCoroutineScope()
+    private val tabs = listOf(
+        context.getString(R.string.main_tabs_book_list_title),
+        context.getString(R.string.main_tabs_stats_title)
+    )
 
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top){
-        TabRow(selectedTabIndex = tabIndex.value,
-            indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
-                    color = Color.Green,
-                )
-            },
-            backgroundColor = Color.White){
-            tabs.forEachIndexed { index, title ->
-                Tab(text = { Text(title)},
-                    selected = tabIndex.value == index,
-                    onClick = {
-                        scope.launch{
-                            pagerState.animateScrollToPage(index)
-                        }
-                        tabIndex.value = index
-                    }
-                )
+    @Composable
+    fun GenerateLayout() {
+        LayoutMain()
+    }
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    fun LayoutMain() {
+        val tabIndex = remember { mutableStateOf(0) }
+        val pagerState = rememberPagerState()
+        val scope = rememberCoroutineScope()
+
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top) {
+            TabRow(
+                selectedTabIndex = tabIndex.value,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+                        color = Color.Green,
+                    )
+                },
+                backgroundColor = Color.White
+            ) {
+                MainTabs(tabIndex, scope, pagerState)
             }
+            MainTabsPager(pagerState = pagerState)
         }
+
+
+    }
+
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    private fun MainTabs(tabIndex: MutableState<Int>, scope: CoroutineScope, pagerState: PagerState) {
+
+        tabs.forEachIndexed { index, title ->
+            Tab(text = { Text(title) },
+                selected = tabIndex.value == index,
+                onClick = {
+                    scope.launch {
+                        pagerState.animateScrollToPage(index)
+                    }
+                    tabIndex.value = index
+                }
+            )
+        }
+    }
+
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    private fun MainTabsPager(pagerState: PagerState){
         HorizontalPager(state = pagerState, count = tabs.size) {
-            when(it){
-                0 -> LayoutMainBooks(context)
-                1 -> StatsTabbedLayout()
+            when (it) {
+                0 -> MainBooksUI(context).GenerateLayout()
+                1 -> MainStatsUI(context).GenerateLayout()
             }
         }
     }

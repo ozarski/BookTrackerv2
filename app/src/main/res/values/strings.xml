@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BookTracker2_0</string>
+    <string name="total_stats_tab_title">Total</string>
+    <string name="year_stats_tab_title">Year</string>
+    <string name="month_stats_tab_title">Month</string>
+    <string name="main_tabs_book_list_title">Books</string>
+    <string name="main_tabs_stats_title">Stats</string>
 </resources>
