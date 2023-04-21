@@ -28,9 +28,9 @@ import ozarskiapps.booktracker.tag.Tag
 fun LayoutMainBooks(context: Context){
     val text = remember { mutableStateOf("Reading") }
     val tagList = TagDBService(context).getAllTags().toMutableList()
-    tagList.add(Tag(name = "${BookStatus.Reading}", color = "#000000"))
-    tagList.add(Tag(name = "${BookStatus.Finished}", color = "#000000"))
-    tagList.add(Tag(name = "${BookStatus.WantToRead}", color = "#000000"))
+    tagList.add(Tag(name = "${BookStatus.Reading}", color = Color.Gray))
+    tagList.add(Tag(name = "${BookStatus.Finished}", color = Color.Green))
+    tagList.add(Tag(name = "${BookStatus.WantToRead}", color = Color.Blue))
     val bookList = remember { mutableStateListOf(BookDBService(context).getAllBooks()) }
 
     val isOpen = remember {

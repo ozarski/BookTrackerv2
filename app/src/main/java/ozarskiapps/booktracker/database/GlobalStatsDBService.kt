@@ -8,9 +8,9 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
     fun getTotalNumberOfPages(): Long {
         val db = this.readableDatabase
-        val result = "totalNumberOfPages"
+        val resultColumn = "totalNumberOfPages"
         val projection =
-            arrayOf("SUM(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $result")
+            arrayOf("SUM(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $resultColumn")
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -22,7 +22,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         )
         with(cursor) {
             if (moveToFirst()) {
-                val numberOfPages = getLong(getColumnIndexOrThrow(result))
+                val numberOfPages = getLong(getColumnIndexOrThrow(resultColumn))
                 return if (numberOfPages > 0) numberOfPages else 0
             }
         }
@@ -31,8 +31,8 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
     fun getTotalNumberOfBooks(): Int {
         val db = this.readableDatabase
-        val result = "totalNumberOfBooks"
-        val projection = arrayOf("COUNT(*) as $result")
+        val resultColumn = "totalNumberOfBooks"
+        val projection = arrayOf("COUNT(*) as $resultColumn")
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -44,7 +44,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         )
         with(cursor) {
             if (moveToFirst()) {
-                return getInt(getColumnIndexOrThrow(result))
+                return getInt(getColumnIndexOrThrow(resultColumn))
             }
         }
         return 0
@@ -52,9 +52,9 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
     fun getAverageNumberOfPagesPerBook(): Double {
         val db = this.readableDatabase
-        val result = "averageNumberOfPagesPerBook"
+        val resultColumn = "averageNumberOfPagesPerBook"
         val projection =
-            arrayOf("AVG(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $result")
+            arrayOf("AVG(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $resultColumn")
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -66,7 +66,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         )
         with(cursor) {
             if (moveToFirst()) {
-                val averageNumberOfPagesPerBook = getDouble(getColumnIndexOrThrow(result))
+                val averageNumberOfPagesPerBook = getDouble(getColumnIndexOrThrow(resultColumn))
                 return if (averageNumberOfPagesPerBook > 0) averageNumberOfPagesPerBook else 0.0
             }
         }
@@ -91,8 +91,9 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
         val numberOfBooks = getTotalNumberOfBooks()
         val db = this.readableDatabase
-        val result = "minDate"
-        val projection = arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $result")
+        val resultColumn = "minDate"
+        val projection =
+            arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $resultColumn")
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -105,7 +106,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
         with(cursor) {
             if (moveToFirst()) {
-                val minDate = getLong(getColumnIndexOrThrow(result))
+                val minDate = getLong(getColumnIndexOrThrow(resultColumn))
                 val numberOfMonths = getNumberOfMonthsBetweenDates(
                     Calendar.getInstance().apply {
                         timeInMillis = minDate
@@ -122,8 +123,9 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
     fun getAverageBooksPerWeek(): Double {
         val numberOfBooks = getTotalNumberOfBooks()
         val db = this.readableDatabase
-        val result = "minDate"
-        val projection = arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $result")
+        val resultColumn = "minDate"
+        val projection =
+            arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $resultColumn")
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -136,7 +138,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
         with(cursor) {
             if (moveToFirst()) {
-                val minDate = getLong(getColumnIndexOrThrow(result))
+                val minDate = getLong(getColumnIndexOrThrow(resultColumn))
                 val numberOfWeeks = getNumberOfWeeksBetweenDates(
                     Calendar.getInstance().apply {
                         timeInMillis = minDate
@@ -152,8 +154,9 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
     fun getMonthWithMostBooksRead(): String {
         val db = this.readableDatabase
-        val result = "minDate"
-        val projection = arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $result")
+        val resultColumn = "minDate"
+        val projection =
+            arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $resultColumn")
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -167,7 +170,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         var minDate = 0L
         with(cursor) {
             if (moveToFirst()) {
-                minDate = getLong(getColumnIndexOrThrow(result))
+                minDate = getLong(getColumnIndexOrThrow(resultColumn))
             }
         }
         if (minDate == 0L) {
@@ -203,10 +206,11 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
 
     fun getMostReadAuthor(): String {
         val db = this.readableDatabase
-        val result = "author"
-        val projection = arrayOf("COUNT(${DatabaseConstants.BookTable.AUTHOR_COLUMN}) as $result, ${DatabaseConstants.BookTable.AUTHOR_COLUMN}")
+        val resultColumn = "author"
+        val projection =
+            arrayOf("COUNT(${DatabaseConstants.BookTable.AUTHOR_COLUMN}) as $resultColumn, ${DatabaseConstants.BookTable.AUTHOR_COLUMN}")
         val groupBy = DatabaseConstants.BookTable.AUTHOR_COLUMN
-        val orderBy = "$result DESC"
+        val orderBy = "$resultColumn DESC"
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
@@ -216,7 +220,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
             null,
             orderBy
         )
-        with(cursor){
+        with(cursor) {
             if (moveToFirst()) {
                 return getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
             }
@@ -250,7 +254,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         return numberOfWeeks
     }
 
-    fun getMonthNameAndYearEnglish(date: Calendar): String {
+    private fun getMonthNameAndYearEnglish(date: Calendar): String {
         return "${date.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)} ${
             date.get(
                 Calendar.YEAR
@@ -258,7 +262,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         }"
     }
 
-    fun getCalendarMonthStart(calendar: Calendar): Calendar {
+    private fun getCalendarMonthStart(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis
         }
@@ -269,7 +273,7 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         return cal
     }
 
-    fun getCalendarMonthEnd(calendar: Calendar): Calendar {
+    private fun getCalendarMonthEnd(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis
         }

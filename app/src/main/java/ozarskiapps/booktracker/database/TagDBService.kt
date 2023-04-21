@@ -2,7 +2,9 @@ package ozarskiapps.booktracker.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.provider.BaseColumns
+import androidx.compose.ui.graphics.Color
 import ozarskiapps.booktracker.tag.Tag
 
 class TagDBService(val context: Context) : DBService(context) {
@@ -11,7 +13,7 @@ class TagDBService(val context: Context) : DBService(context) {
         val db = this.writableDatabase
         val contentValues = ContentValues().apply {
             put(DatabaseConstants.TagTable.TAG_NAME_COLUMN, tag.name)
-            put(DatabaseConstants.TagTable.TAG_COLOR_COLUMN, tag.color)
+            put(DatabaseConstants.TagTable.TAG_COLOR_COLUMN, tag.color.value.toString())
         }
         return db.insert(DatabaseConstants.TagTable.TABLE_NAME, null, contentValues)
     }
@@ -20,7 +22,7 @@ class TagDBService(val context: Context) : DBService(context) {
         val db = this.writableDatabase
         val contentValues = ContentValues().apply {
             put(DatabaseConstants.TagTable.TAG_NAME_COLUMN, tag.name)
-            put(DatabaseConstants.TagTable.TAG_COLOR_COLUMN, tag.color)
+            put(DatabaseConstants.TagTable.TAG_COLOR_COLUMN, tag.color.value.toString())
         }
         db.update(
             DatabaseConstants.TagTable.TABLE_NAME,
@@ -37,7 +39,7 @@ class TagDBService(val context: Context) : DBService(context) {
             "${BaseColumns._ID} = ?",
             arrayOf(id.toString())
         )
-        removeTagFromBook(tagID = id)
+        removeBookTagItems(tagID = id)
     }
 
     fun getTagByID(id: Long): Tag? {
@@ -59,13 +61,7 @@ class TagDBService(val context: Context) : DBService(context) {
             null
         )
         if (cursor.moveToFirst()) {
-            val tag = Tag(
-                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_NAME_COLUMN)),
-                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_COLOR_COLUMN)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-            )
-            cursor.close()
-            return tag
+            return getTagFromCursor(cursor)
         }
         cursor.close()
         return null
@@ -80,7 +76,7 @@ class TagDBService(val context: Context) : DBService(context) {
         db.insert(DatabaseConstants.BookTagTable.TABLE_NAME, null, contentValues)
     }
 
-    fun removeTagFromBook(tagID: Long? = null, bookID: Long? = null) {
+    fun removeBookTagItems(tagID: Long? = null, bookID: Long? = null) {
         val db = this.writableDatabase
         if(tagID == null && bookID == null) {
             return
@@ -122,11 +118,7 @@ class TagDBService(val context: Context) : DBService(context) {
         )
         val tags = mutableListOf<Tag>()
         while (cursor.moveToNext()) {
-            val tag = Tag(
-                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_NAME_COLUMN)),
-                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_COLOR_COLUMN)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-            )
+            val tag = getTagFromCursor(cursor)
             tags.add(tag)
         }
         cursor.close()
@@ -203,5 +195,18 @@ class TagDBService(val context: Context) : DBService(context) {
         }
         cursor.close()
         return tags
+    }
+
+    private fun getTagFromCursor(cursor: Cursor): Tag{
+        val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
+        val name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_NAME_COLUMN))
+        val colorString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_COLOR_COLUMN))
+        val color = Color(colorString.toULong())
+
+        return Tag(
+            name,
+            color,
+            id
+        )
     }
 }

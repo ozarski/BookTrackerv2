@@ -1,3 +1,5 @@
 package ozarskiapps.booktracker.tag
 
-data class Tag(var name: String, var color: String, var id: Long = -1)
+import androidx.compose.ui.graphics.Color
+
+data class Tag(var name: String, var color: Color, var id: Long = -1)

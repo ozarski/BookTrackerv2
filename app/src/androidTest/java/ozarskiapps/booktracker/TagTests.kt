@@ -5,6 +5,7 @@ import org.junit.Before
 import ozarskiapps.booktracker.database.TagDBService
 import android.content.Context
 import android.provider.BaseColumns
+import androidx.compose.ui.graphics.Color
 import junit.framework.TestCase.assertEquals
 import org.junit.After
 import org.junit.Test
@@ -31,14 +32,14 @@ class TagTests {
 
     @Test
     fun addTagToDB() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
     }
 
     @Test
     fun updateTag() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         tag.name = "Updated tag"
         tagDBService.updateTag(tag)
@@ -64,7 +65,7 @@ class TagTests {
 
     @Test
     fun removeTag() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         tagDBService.deleteTagByID(tag.id)
@@ -83,7 +84,7 @@ class TagTests {
 
     @Test
     fun getTagByID() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val tagFromDB = tagDBService.getTagByID(tag.id)
@@ -92,7 +93,7 @@ class TagTests {
 
     @Test
     fun getTagByIDFail() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val tagFromDB = tagDBService.getTagByID(tag.id + 1)
@@ -101,13 +102,13 @@ class TagTests {
 
     @Test
     fun getAllTags() {
-        val tag1 = Tag("Test tag 1", "#FFFFFF")
+        val tag1 = Tag("Test tag 1", Color.Gray)
         tag1.id = tagDBService.addTag(tag1)
         testTagAddSuccess(tag1)
-        val tag2 = Tag("Test tag 2", "#FFFFFF")
+        val tag2 = Tag("Test tag 2", Color.Gray)
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
-        val tag3 = Tag("Test tag 3", "#FFFFFF")
+        val tag3 = Tag("Test tag 3", Color.Gray)
         tag3.id = tagDBService.addTag(tag3)
         testTagAddSuccess(tag3)
 
@@ -127,7 +128,7 @@ class TagTests {
 
     @Test
     fun addTagToBook() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
@@ -159,12 +160,12 @@ class TagTests {
 
     @Test
     fun removeTagFromBook() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
-        tagDBService.removeTagFromBook(tag.id, bookID)
+        tagDBService.removeBookTagItems(tag.id, bookID)
 
         val projection = arrayOf(
             DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
@@ -185,12 +186,12 @@ class TagTests {
 
     @Test
     fun removeTagFromBookFailWrongTagID() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
-        tagDBService.removeTagFromBook(tag.id + 1, bookID)
+        tagDBService.removeBookTagItems(tag.id + 1, bookID)
 
         val projection = arrayOf(
             DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
@@ -211,12 +212,12 @@ class TagTests {
 
     @Test
     fun removeTagFromBookFailWrongBookID() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
         tagDBService.assignTagToBook(tag.id, bookID)
-        tagDBService.removeTagFromBook(tag.id, bookID + 1)
+        tagDBService.removeBookTagItems(tag.id, bookID + 1)
 
         val projection = arrayOf(
             DatabaseConstants.BookTagTable.BOOK_ID_COLUMN,
@@ -237,7 +238,7 @@ class TagTests {
 
     @Test
     fun removeTagFromBookOnTagDelete() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
@@ -263,10 +264,10 @@ class TagTests {
 
     @Test
     fun removeTagBookRecordsOnBookDelete() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2", "#FFFFFF")
+        val tag2 = Tag("Test tag 2", Color.Gray)
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val bookID = 1L
@@ -293,7 +294,7 @@ class TagTests {
 
     @Test
     fun getNumberOfBooksUnderTag() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
@@ -304,7 +305,7 @@ class TagTests {
 
     @Test
     fun getNumberOfBookUnderTagFailNoBooksInDB() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val numberOfBooks = tagDBService.getNumberOfBooksUnderTag(tag.id)
@@ -313,7 +314,7 @@ class TagTests {
 
     @Test
     fun getBooksForOneTag() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val bookID = 1L
@@ -325,7 +326,7 @@ class TagTests {
 
     @Test
     fun getBooksForOneTagFailNoBooksAssignedToTag() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
         val books = tagDBService.getBooksForTagIDs(listOf(tag.id))
@@ -334,10 +335,10 @@ class TagTests {
 
     @Test
     fun getBooksForTwoTags() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2", "#FFFFFF")
+        val tag2 = Tag("Test tag 2", Color.Gray)
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val bookID = 1L
@@ -350,10 +351,10 @@ class TagTests {
 
     @Test
     fun getBooksForTwoTagsFailNoBooksAssignedToOneTag() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2", "#FFFFFF")
+        val tag2 = Tag("Test tag 2", Color.Gray)
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val bookID = 1L
@@ -364,16 +365,37 @@ class TagTests {
 
     @Test
     fun getBooksForTwoTagsFailNoBooksAssignedToBothTags() {
-        val tag = Tag("Test tag", "#FFFFFF")
+        val tag = Tag("Test tag", Color.Gray)
         tag.id = tagDBService.addTag(tag)
         testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2", "#FFFFFF")
+        val tag2 = Tag("Test tag 2", Color.Gray)
         tag2.id = tagDBService.addTag(tag2)
         testTagAddSuccess(tag2)
         val books = tagDBService.getBooksForTagIDs(listOf(tag.id, tag2.id))
         assertEquals(0, books.size)
     }
 
+
+    @Test
+    fun getTagsForBookID(){
+        val tag = Tag("Test tag", Color.Gray)
+        tag.id = tagDBService.addTag(tag)
+        testTagAddSuccess(tag)
+        val tag2 = Tag("Test tag 2", Color.Gray)
+        tag2.id = tagDBService.addTag(tag2)
+        testTagAddSuccess(tag2)
+        val bookID = 1L
+        tagDBService.assignTagToBook(tag.id, bookID)
+        tagDBService.assignTagToBook(tag2.id, bookID)
+        val tags = tagDBService.getTagsForBookID(bookID)
+        assertEquals(2, tags.size)
+        assertEquals(tag.id, tags[0].id)
+        assertEquals(tag.name, tags[0].name)
+        assertEquals(tag.color, tags[0].color)
+        assertEquals(tag2.id, tags[1].id)
+        assertEquals(tag2.name, tags[1].name)
+        assertEquals(tag2.color, tags[1].color)
+    }
     private fun testTagAddSuccess(tag: Tag) {
         val projection = arrayOf(
             BaseColumns._ID,
@@ -395,29 +417,10 @@ class TagTests {
         val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
         val name =
             cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_NAME_COLUMN))
+        val colorString = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.TagTable.TAG_COLOR_COLUMN))
+        val color = Color(colorString.toULong())
         assertEquals(tag.id, id)
         assertEquals(tag.name, name)
-        assertEquals(tag.color, tag.color)
-    }
-
-    @Test
-    fun getTagsForBookID(){
-        val tag = Tag("Test tag", "#FFFFFF")
-        tag.id = tagDBService.addTag(tag)
-        testTagAddSuccess(tag)
-        val tag2 = Tag("Test tag 2", "#FFFFFF")
-        tag2.id = tagDBService.addTag(tag2)
-        testTagAddSuccess(tag2)
-        val bookID = 1L
-        tagDBService.assignTagToBook(tag.id, bookID)
-        tagDBService.assignTagToBook(tag2.id, bookID)
-        val tags = tagDBService.getTagsForBookID(bookID)
-        assertEquals(2, tags.size)
-        assertEquals(tag.id, tags[0].id)
-        assertEquals(tag.name, tags[0].name)
-        assertEquals(tag.color, tags[0].color)
-        assertEquals(tag2.id, tags[1].id)
-        assertEquals(tag2.name, tags[1].name)
-        assertEquals(tag2.color, tags[1].color)
+        assertEquals(tag.color, color)
     }
 }

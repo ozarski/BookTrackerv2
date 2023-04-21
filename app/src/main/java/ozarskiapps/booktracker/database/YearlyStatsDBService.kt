@@ -62,12 +62,12 @@ class YearlyStatsDBService(
         return books
     }
 
-    fun getTotalNumberOfPages(): Long {
-        return if (books.isEmpty()) 0 else books.sumOf { it.numberOfPages }.toLong()
-    }
-
     fun getTotalNumberOfBooks(): Int {
         return books.size
+    }
+
+    fun getTotalNumberOfPages(): Long {
+        return if (books.isEmpty()) 0 else books.sumOf { it.numberOfPages }.toLong()
     }
 
     fun getAverageNumberOfPagesPerBook(): Double {

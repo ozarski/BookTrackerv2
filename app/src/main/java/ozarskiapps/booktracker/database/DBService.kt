@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-open class DBService(val appContext: Context) : SQLiteOpenHelper(
+open class DBService(private val appContext: Context) : SQLiteOpenHelper(
     appContext,
     DatabaseConstants.DATABASE_NAME,
     null,

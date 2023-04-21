@@ -57,9 +57,8 @@ class MockData(val context: Context): DBService(context) {
         )
         val tagDBService = TagDBService(context)
         for (i in 1..5){
-            val argbcolor = tagColors.random().toArgb()
-            val hexString = "#${Integer.toHexString(argbcolor).substring(2)}"
-            val tag = Tag("Tag $i", hexString)
+            val randomColor = tagColors.random()
+            val tag = Tag("Tag $i", randomColor)
             tagDBService.addTag(tag)
         }
 

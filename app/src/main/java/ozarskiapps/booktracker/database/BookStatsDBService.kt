@@ -9,7 +9,7 @@ import kotlin.math.floor
 
 class BookStatsDBService(val context: Context): DBService(context) {
 
-    //currentDay is used for testing purposes DO NOT USE PASS THE currentDay PARAMETER OUTSIDE OF TESTS
+    //currentDay is used for testing purposes DO NOT PASS THE currentDay PARAMETER OUTSIDE OF TESTS
     fun getBookPredictedReadingTime(book: Book, currentDay: Calendar = Calendar.getInstance()): Int?{
         if(book.bookStatus != BookStatus.Reading || book.currentProgress == 0f){
             return null
@@ -19,7 +19,7 @@ class BookStatsDBService(val context: Context): DBService(context) {
         return ceil(book.numberOfPages / pagesPerDay).toInt()
     }
 
-    //currentDay is used for testing purposes DO NOT USE PASS THE currentDay PARAMETER OUTSIDE OF TESTS
+    //currentDay is used for testing purposes DO NOT PASS THE currentDay PARAMETER OUTSIDE OF TESTS
     fun getBookPredictedFinishDate(book: Book, currentDay: Calendar = Calendar.getInstance()): Long{
         val predictedReadingTime = getBookPredictedReadingTime(book, currentDay)
         return if(predictedReadingTime != null){

@@ -87,14 +87,14 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
         )
     }
 
+    fun getTotalNumberOfBooks(): Int {
+        return books.size
+    }
+
     fun getTotalNumberOfPages(): Long {
         if (getTotalNumberOfBooks() == 0) return 0
 
         return books.sumOf { it.numberOfPages }.toLong()
-    }
-
-    fun getTotalNumberOfBooks(): Int {
-        return books.size
     }
 
     fun getAverageNumberOfPagesPerBook(): Double {
@@ -127,7 +127,7 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
     }
 
     fun getAverageBooksPerWeek(): Double {
-        if(getTotalNumberOfBooks()==0) return 0.0
+        if (getTotalNumberOfBooks() == 0) return 0.0
         return getTotalNumberOfBooks().toDouble() / 4.0
     }
 
