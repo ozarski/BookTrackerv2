@@ -4,16 +4,17 @@ import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import ozarskiapps.booktracker.OPEN_LIBRARY_API_CONNECTION_STRING
+import ozarskiapps.booktracker.OPEN_LIBRARY_API_SELECTION_FIELDS
 import java.util.*
 
-class BookSearchService(val okHttpClient: OkHttpClient) {
-    private val connectionString = "https://openlibrary.org/search.json?q="
+class BookSearchService(private val okHttpClient: OkHttpClient) {
     private val selectionFields = "title,author_name,number_of_pages_median,key"
 
     fun searchBooksByTitle(title: String, limit: Int): String? {
         // Build the request object
         val request = Request.Builder()
-            .url("$connectionString${title.lowercase(Locale.getDefault())}&fields=$selectionFields&limit=$limit")
+            .url("$OPEN_LIBRARY_API_CONNECTION_STRING${title.lowercase(Locale.getDefault())}&fields=$OPEN_LIBRARY_API_SELECTION_FIELDS&limit=$limit")
             .build()
 
         // Make the request and get the response

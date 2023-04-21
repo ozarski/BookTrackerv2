@@ -15,7 +15,7 @@ class OpenLibraryAPIBook(
 ){
     override fun toString(): String {
         return "Title: $title \t" +
-                "Author: $authorName \t" +
+                "Author: ${authorsToString()} \t" +
                 "Number of pages: $numberOfPagesMedian"
     }
 
