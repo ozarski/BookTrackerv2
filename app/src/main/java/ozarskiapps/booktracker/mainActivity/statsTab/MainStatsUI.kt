@@ -1,9 +1,7 @@
 package ozarskiapps.booktracker.mainActivity.statsTab
 
 import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material3.Tab
@@ -11,6 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -49,8 +49,8 @@ class MainStatsUI(context: Context) {
                 backgroundColor = Color.White
             ) {
                 StatsTabs(tabIndex, scope, pagerState)
-                StatsTabsPager(pagerState = pagerState)
             }
+            StatsTabsPager(pagerState = pagerState)
         }
     }
 
@@ -86,4 +86,11 @@ class MainStatsUI(context: Context) {
             }
         }
     }
+
+}
+
+@Preview
+@Composable
+fun Preview() {
+    MainStatsUI(context = LocalContext.current).GenerateLayout()
 }

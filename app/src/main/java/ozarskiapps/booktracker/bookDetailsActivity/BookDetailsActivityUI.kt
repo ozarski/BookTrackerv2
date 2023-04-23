@@ -13,6 +13,11 @@ class BookDetailsActivityUI(book: MutableState<Book>, context: Context) :
     BookDetailsUI(book, context) {
     @Composable
     override fun GenerateLayout() {
+        BookDetailsLayout()
+    }
+
+    @Composable
+    fun BookDetailsLayout(){
         val bookStatus = remember { mutableStateOf(book.value.bookStatus) }
         when (bookStatus.value) {
             BookStatus.Finished -> {

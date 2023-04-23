@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
+import ozarskiapps.booktracker.database.BookDBService
 
 class BookDetailsActivity : ComponentActivity() {
 
@@ -17,25 +18,29 @@ class BookDetailsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             //replace with book from database
+            val id = intent.getLongExtra("BOOK_ID", -1)
+            if (id == -1L) {
+                onBackPressedDispatcher.onBackPressed()
+                throw Exception("Book id not found")
+            }
             val book = remember {
                 mutableStateOf(
-                    Book(
-                        "The Lord of the Rings",
-                        "J.R.R. Tolkien",
-                        1178,
-                        0f,
-                        BookStatus.WantToRead,
-                        java.util.Calendar.getInstance(),
-                        java.util.Calendar.getInstance(),
-                        0
-                    )
+                    BookDBService(this).getBookByID(id)
                 )
             }
-            BookDetailsActivityUI(book, this).GenerateLayout()
+            if(book.value == null) {
+                onBackPressedDispatcher.onBackPressed()
+                throw Exception("Book not found")
+            }
+            else{
+                val notNullBook = remember { mutableStateOf(book.value!!) }
+                BookDetailsActivityUI(notNullBook, this).GenerateLayout()
+            }
         }
     }
 
 }
+
 @Preview
 @Composable
 private fun BookDetailsLayout() {

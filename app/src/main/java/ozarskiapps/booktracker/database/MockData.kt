@@ -19,11 +19,11 @@ class MockData(val context: Context): DBService(context) {
         val bookDBService = BookDBService(context)
 
 
-        for (i in 1..10){
+        for (i in 1..50){
             val book = Book(
                 "Book $i",
                 "Author $i",
-                100,
+                1000,
                 i*5f,
                 BookStatus.values()[i%3],
                 Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, i-10) },
