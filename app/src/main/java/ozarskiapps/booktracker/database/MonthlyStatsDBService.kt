@@ -131,6 +131,13 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
         return getTotalNumberOfBooks().toDouble() / 4.0
     }
 
+    //timeNow is used only for testing, DO NOT PASS THIS PARAMETER IN PROD
+    fun getMonthProgress(timeNow: Calendar = Calendar.getInstance()): Double {
+        val maxDays = timeNow.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val currentDay = timeNow.get(Calendar.DAY_OF_MONTH)
+        return currentDay.toDouble()/maxDays.toDouble()
+    }
+
     private fun getCalendarMonthStart(calendar: Calendar): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = calendar.timeInMillis

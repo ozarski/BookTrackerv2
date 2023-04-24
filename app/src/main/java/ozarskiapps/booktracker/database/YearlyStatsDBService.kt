@@ -87,7 +87,7 @@ class YearlyStatsDBService(
     }
 
     fun getAveragePagesPerDay(): Double {
-        if(getTotalNumberOfBooks() == 0) return 0.0
+        if (getTotalNumberOfBooks() == 0) return 0.0
         val readingTimeDBService = ReadingTimeDBService(context)
         val startTime = getCalendarYearStart()
         val endTime = getCalendarYearEnd()
@@ -97,33 +97,40 @@ class YearlyStatsDBService(
     }
 
     fun getAverageBooksPerMonth(): Double {
-        if(getTotalNumberOfBooks() == 0) return 0.0
+        if (getTotalNumberOfBooks() == 0) return 0.0
 
         return getTotalNumberOfBooks() / 12.0
     }
 
     fun getAverageBooksPerWeek(): Double {
-        if(getTotalNumberOfBooks() == 0) return 0.0
+        if (getTotalNumberOfBooks() == 0) return 0.0
 
         return getTotalNumberOfBooks() / 52.0
     }
 
     fun getMonthWithMostBooksRead(): String {
-        if(getTotalNumberOfBooks() == 0) return "-"
+        if (getTotalNumberOfBooks() == 0) return "-"
         val calendar = Calendar.getInstance().apply { set(Calendar.MONTH, 0) }
         var maxBooksPerMonth = getNumberOfBooksForMonth(calendar)
         var month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
 
-        for(i in 1..11){
+        for (i in 1..11) {
             calendar.set(Calendar.MONTH, i)
             val booksForMonth = getNumberOfBooksForMonth(calendar)
-            if(booksForMonth > maxBooksPerMonth){
+            if (booksForMonth > maxBooksPerMonth) {
                 maxBooksPerMonth = booksForMonth
                 month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
             }
         }
 
         return month ?: "-"
+    }
+
+    //timeNow is used only for testing, DO NOT PASS THIS PARAMETER IN PROD
+    fun getYearProgress(timeNow: Calendar = Calendar.getInstance()): Double {
+        val maxDays = timeNow.getActualMaximum(Calendar.DAY_OF_YEAR)
+        val currentDay = timeNow.get(Calendar.DAY_OF_YEAR)
+        return currentDay.toDouble()/maxDays.toDouble()
     }
 
     private fun getCalendarMonthStart(calendar: Calendar): Calendar {
@@ -176,7 +183,7 @@ class YearlyStatsDBService(
         )
     }
 
-    private fun getCalendarYearStart(): Calendar{
+    private fun getCalendarYearStart(): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = year.timeInMillis
         }
@@ -188,7 +195,7 @@ class YearlyStatsDBService(
         return cal
     }
 
-    private fun getCalendarYearEnd(): Calendar{
+    private fun getCalendarYearEnd(): Calendar {
         val cal = Calendar.getInstance().apply {
             timeInMillis = year.timeInMillis
         }
@@ -200,10 +207,10 @@ class YearlyStatsDBService(
         return cal
     }
 
-    fun getNumberOfBooksForMonth(month: Calendar): Int{
+    fun getNumberOfBooksForMonth(month: Calendar): Int {
         val start = getCalendarMonthStart(month)
         val end = getCalendarMonthEnd(month)
-        val booksThisMonth = books.filter{ book ->
+        val booksThisMonth = books.filter { book ->
             book.endDate.timeInMillis >= start.timeInMillis && book.endDate.timeInMillis <= end.timeInMillis
         }
         return booksThisMonth.size

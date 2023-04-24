@@ -159,6 +159,17 @@ class YearlyStatsTests {
         assertEquals(2, numberOfBooksForMonth)
     }
 
+    @Test
+    fun getYearProgress(){
+        val timeNow = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_YEAR, 5)
+            set(Calendar.YEAR, 2023)
+        }
+
+        val yearProgress = yearlyStatsService.getYearProgress(timeNow)
+        assertEquals(0.013, yearProgress, 0.001)
+    }
+
 
     private fun addBooks() {
         val book1 = Book(

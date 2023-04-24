@@ -121,6 +121,17 @@ class MonthlyStatsTests {
         assertEquals(0.0, averageBooksPerWeek)
     }
 
+    @Test
+    fun getYearProgress(){
+        val timeNow = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, 5)
+            set(Calendar.MONTH, 3)
+        }
+
+        val monthProgress = monthlyStatsService.getMonthProgress(timeNow)
+        assertEquals(0.166, monthProgress, 0.001)
+    }
+
     private fun addBooks() {
         val book1 = Book(
             "Book 1",

@@ -1,5 +1,6 @@
 package ozarskiapps.booktracker.mainActivity.statsTab
 
+import android.content.Context
 import android.widget.NumberPicker
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -18,9 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import ozarskiapps.booktracker.database.GlobalStatsDBService
+import ozarskiapps.booktracker.database.YearlyStatsDBService
 import java.util.*
 
-class YearStatsUI : StatsTabUI() {
+class YearStatsUI(private val context: Context) : StatsTabUI() {
 
     @Composable
     override fun GenerateLayout() {
@@ -38,31 +41,41 @@ class YearStatsUI : StatsTabUI() {
 
 
             DateButton(Calendar.getInstance())
-            TotalPagesText(23456)
+
+            val totalPages = YearlyStatsDBService(context).getTotalNumberOfPages()
+            val totalBooks = YearlyStatsDBService(context).getTotalNumberOfBooks()
+            val averagePagesPerDay = YearlyStatsDBService(context).getAveragePagesPerDay()
+            val averagePagesPerBook = YearlyStatsDBService(context).getAverageNumberOfPagesPerBook()
+            val averageDaysPerBook = YearlyStatsDBService(context).getAverageReadingTime()
+            val averageBooksPerMonth = YearlyStatsDBService(context).getAverageBooksPerMonth()
+            val averageBooksPerWeek = YearlyStatsDBService(context).getAverageBooksPerWeek()
+            val monthWithMostBooksRead = YearlyStatsDBService(context).getMonthWithMostBooksRead()
+
+            TotalPagesText(value = totalPages)
 
             StatRow(
                 stat1Name = "books read",
-                stat1Value = "8",
+                stat1Value = totalBooks.toString(),
                 stat2Name = "pages per day",
-                stat2Value = "42"
+                stat2Value = averagePagesPerDay.toString()
             )
             StatRow(
                 stat1Name = "pages per book",
-                stat1Value = "315.1",
+                stat1Value = averagePagesPerBook.toString(),
                 stat2Name = "days per book",
-                stat2Value = "7.5"
+                stat2Value = averageDaysPerBook.toString()
             )
             StatRow(
-                stat1Name = "books will be read with current pace",
-                stat1Value = "40",
-                stat2Name = "books per month",
-                stat2Value = "0.7"
+                stat1Name = "books per month",
+                stat1Value = averageBooksPerMonth.toString(),
+                stat2Name = "books per week",
+                stat2Value = averageBooksPerWeek.toString()
             )
             StatRow(
-                stat1Name = "books per week",
-                stat1Value = "0.9",
-                stat2Name = "year progress",
-                stat2Value = "19.8%"
+                stat1Name = "month with most books",
+                stat1Value = monthWithMostBooksRead,
+                stat2Name = "",
+                stat2Value = ""
             )
         }
     }

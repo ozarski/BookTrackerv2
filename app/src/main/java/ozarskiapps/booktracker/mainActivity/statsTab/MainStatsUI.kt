@@ -80,9 +80,9 @@ class MainStatsUI(context: Context) {
 
         HorizontalPager(state = pagerState, count = tabs.size) {
             when (it) {
-                0 -> TotalStatsUI().GenerateLayout()
-                1 -> YearStatsUI().GenerateLayout()
-                2 -> MonthStatsUI().GenerateLayout()
+                0 -> TotalStatsUI(LocalContext.current).GenerateLayout()
+                1 -> YearStatsUI(LocalContext.current).GenerateLayout()
+                2 -> MonthStatsUI(LocalContext.current).GenerateLayout()
             }
         }
     }
