@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ozarskiapps.booktracker.database.MonthlyStatsDBService
+import ozarskiapps.booktracker.roundDouble
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,6 +47,7 @@ class MonthStatsUI(private val context: Context): StatsTabUI(){
             val averagePagesPerBook = MonthlyStatsDBService(context).getAverageNumberOfPagesPerBook()
             val averageDaysPerBook = MonthlyStatsDBService(context).getAverageReadingTime()
             val averageBooksPerWeek = MonthlyStatsDBService(context).getAverageBooksPerWeek()
+            val monthProgress = MonthlyStatsDBService(context).getMonthProgress()
 
             TotalPagesText(value = totalPages)
 
@@ -53,19 +55,19 @@ class MonthStatsUI(private val context: Context): StatsTabUI(){
                 stat1Name = "books read",
                 stat1Value = totalBooks.toString(),
                 stat2Name = "pages per day",
-                stat2Value = averagePagesPerDay.toString()
+                stat2Value = roundDouble(averagePagesPerDay, 10).toString()
             )
             StatRow(
                 stat1Name = "pages per book",
-                stat1Value = averagePagesPerBook.toString(),
+                stat1Value = roundDouble(averagePagesPerBook, 10).toString(),
                 stat2Name = "days per book",
-                stat2Value = averageDaysPerBook.toString()
+                stat2Value = roundDouble(averageDaysPerBook, 10).toString()
             )
             StatRow(
                 stat2Name = "books per week",
-                stat2Value = averageBooksPerWeek.toString(),
-                stat1Name = "",
-                stat1Value = ""
+                stat2Value = roundDouble(averageBooksPerWeek, 10).toString(),
+                stat1Name = "month progress",
+                stat1Value = "${roundDouble(monthProgress * 100, 10)}%"
             )
 
         }

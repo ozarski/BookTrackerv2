@@ -1,21 +1,24 @@
 package ozarskiapps.booktracker.database
 
 import android.content.Context
+import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.setCalendar
 import java.util.*
 
-class GlobalStatsDBService(val context: Context) : DBService(context) {
+class TotalStatsDBService(val context: Context) : DBService(context) {
 
     fun getTotalNumberOfPages(): Long {
         val db = this.readableDatabase
         val resultColumn = "totalNumberOfPages"
         val projection =
             arrayOf("SUM(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $resultColumn")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -33,11 +36,13 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         val db = this.readableDatabase
         val resultColumn = "totalNumberOfBooks"
         val projection = arrayOf("COUNT(*) as $resultColumn")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -55,11 +60,13 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         val resultColumn = "averageNumberOfPagesPerBook"
         val projection =
             arrayOf("AVG(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $resultColumn")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -94,11 +101,13 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         val resultColumn = "minDate"
         val projection =
             arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $resultColumn")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -126,11 +135,13 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         val resultColumn = "minDate"
         val projection =
             arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $resultColumn")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -157,11 +168,13 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         val resultColumn = "minDate"
         val projection =
             arrayOf("MIN(${DatabaseConstants.BookTable.END_DATE_COLUMN}) as $resultColumn")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             null,
             null,
             null
@@ -209,13 +222,15 @@ class GlobalStatsDBService(val context: Context) : DBService(context) {
         val resultColumn = "author"
         val projection =
             arrayOf("COUNT(${DatabaseConstants.BookTable.AUTHOR_COLUMN}) as $resultColumn, ${DatabaseConstants.BookTable.AUTHOR_COLUMN}")
+        val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(BookStatus.Finished.toString())
         val groupBy = DatabaseConstants.BookTable.AUTHOR_COLUMN
         val orderBy = "$resultColumn DESC"
         val cursor = db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
-            null,
-            null,
+            selection,
+            selectionArgs,
             groupBy,
             null,
             orderBy

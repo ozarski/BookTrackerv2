@@ -10,20 +10,20 @@ import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.database.BookDBService
 import ozarskiapps.booktracker.database.DatabaseConstants
-import ozarskiapps.booktracker.database.GlobalStatsDBService
+import ozarskiapps.booktracker.database.TotalStatsDBService
 import java.util.*
 
 class GlobalStatsTests {
 
     private lateinit var appContext: Context
     private lateinit var bookDBService: BookDBService
-    private lateinit var globalStatsService: GlobalStatsDBService
+    private lateinit var globalStatsService: TotalStatsDBService
 
     @Before
     fun setUp() {
         appContext = InstrumentationRegistry.getInstrumentation().targetContext
         bookDBService = BookDBService(appContext)
-        globalStatsService = GlobalStatsDBService(appContext)
+        globalStatsService = TotalStatsDBService(appContext)
 
     }
 

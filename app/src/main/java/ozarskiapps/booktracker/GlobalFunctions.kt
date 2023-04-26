@@ -26,7 +26,6 @@ fun calendarFromMillis(millis: Long): Calendar {
 
 fun roundDouble(value: Double, multiplier: Int): Double {
     return (value * multiplier).roundToInt() / multiplier.toDouble()
-
 }
 
 fun daysBetweenDates(start: Calendar, end: Calendar): Int {

@@ -114,7 +114,7 @@ class YearlyStatsDBService(
         var maxBooksPerMonth = getNumberOfBooksForMonth(calendar)
         var month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
 
-        for (i in 1..11) {
+        for (i in 1..Calendar.getInstance().get(Calendar.MONTH)) {
             calendar.set(Calendar.MONTH, i)
             val booksForMonth = getNumberOfBooksForMonth(calendar)
             if (booksForMonth > maxBooksPerMonth) {
@@ -126,7 +126,7 @@ class YearlyStatsDBService(
         return month ?: "-"
     }
 
-    //timeNow is used only for testing, DO NOT PASS THIS PARAMETER IN PROD
+    //timeNow is used only for testing, DO NOT PASS THIS PARAMETER IN PRODUCTION CODE
     fun getYearProgress(timeNow: Calendar = Calendar.getInstance()): Double {
         val maxDays = timeNow.getActualMaximum(Calendar.DAY_OF_YEAR)
         val currentDay = timeNow.get(Calendar.DAY_OF_YEAR)
