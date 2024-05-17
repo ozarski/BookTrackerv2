@@ -70,6 +70,4 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
-    //implementation 'com.google.dagger:dagger:2.x'
-    //kapt 'com.google.dagger:dagger-compiler:2.x'
 }

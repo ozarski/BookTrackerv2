@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.database.BookDBService
-import ozarskiapps.booktracker.database.BookStatsDBService
+import ozarskiapps.booktracker.database.BookStatsService
 import ozarskiapps.booktracker.roundDouble
 import java.text.SimpleDateFormat
 import java.util.*
@@ -165,7 +165,7 @@ class ReadingBookDetailsLayout(
         ProgressValueTextRow(text = "Completion: $percentageRounded%")
 
         val estimatedReadingTime =
-            BookStatsDBService(context).getBookPredictedReadingTime(book.value)
+            BookStatsService().getBookPredictedReadingTime(book.value)
         val daysLeft =
             if (estimatedReadingTime != null) estimatedReadingTime - book.value.getDaysSinceStart() else null
         ProgressValueTextRow(
@@ -175,7 +175,7 @@ class ReadingBookDetailsLayout(
                 "Estimated reading time: -"
         )
 
-        val estimatedFinishDate = BookStatsDBService(context).getBookPredictedFinishDate(book.value)
+        val estimatedFinishDate = BookStatsService().getBookPredictedFinishDate(book.value)
         val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.ROOT)
         val estimatedFinishDateText = if (estimatedFinishDate != 0L) {
             sdf.format(estimatedFinishDate)

@@ -9,25 +9,22 @@ import org.junit.Before
 import org.junit.Test
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
-import ozarskiapps.booktracker.database.BookStatsDBService
+import ozarskiapps.booktracker.database.BookStatsService
 import ozarskiapps.booktracker.database.DatabaseConstants
 import java.util.*
 
 class BookStatsTests {
 
-    private lateinit var BookStatsDBService: BookStatsDBService
-    private lateinit var applicationContext: Context
+    private lateinit var bookStatsService: BookStatsService
 
     @Before
     fun setUp() {
-        applicationContext = InstrumentationRegistry.getInstrumentation().targetContext
-        BookStatsDBService = BookStatsDBService(applicationContext)
+        bookStatsService = BookStatsService()
     }
 
     @After
     fun tearDown() {
-        BookStatsDBService.close()
-        applicationContext.deleteDatabase(DatabaseConstants.DATABASE_NAME)
+        bookStatsService
     }
 
     @Test
@@ -38,13 +35,11 @@ class BookStatsTests {
             100,
             10f,
             BookStatus.Reading,
-            Calendar.getInstance().apply { set(2023, 0, 1) },
+            Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) },
             Calendar.getInstance()
         )
 
-        val fakeCurrentDay = book.startDate.clone() as Calendar
-        fakeCurrentDay.add(Calendar.DAY_OF_YEAR, 1)
-        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book, fakeCurrentDay)
+        val predictedReadingTime = bookStatsService.getBookPredictedReadingTime(book)
         assertEquals(20, predictedReadingTime)
     }
 
@@ -56,20 +51,19 @@ class BookStatsTests {
             100,
             10f,
             BookStatus.Reading,
-            Calendar.getInstance().apply { set(2023, 0, 1) },
+            Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) },
             Calendar.getInstance()
         )
 
-        val fakeCurrentDay = book.startDate.clone() as Calendar
-        fakeCurrentDay.add(Calendar.DAY_OF_YEAR, 1)
-        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book, fakeCurrentDay)
-        val predictedFinishDate = BookStatsDBService.getBookPredictedFinishDate(book, fakeCurrentDay)
-        val finishCalendar = book.startDate.clone() as Calendar
-        if(predictedReadingTime != null){
-            finishCalendar.add(Calendar.DAY_OF_YEAR, predictedReadingTime - 1)
-        }
-        else{
-            fail()
+        val predictedReadingTime = bookStatsService.getBookPredictedReadingTime(book)
+        val predictedFinishDate = bookStatsService.getBookPredictedFinishDate(book)
+        val finishCalendar = (book.startDate.clone() as Calendar).apply{
+            if(predictedReadingTime != null){
+                add(Calendar.DAY_OF_YEAR, predictedReadingTime - 1)
+            }
+            else{
+                fail()
+            }
         }
         assertEquals(finishCalendar.timeInMillis, predictedFinishDate)
     }
@@ -81,12 +75,10 @@ class BookStatsTests {
             "Author name",
             100,
             10f,
-            BookStatus.Finished,
-            Calendar.getInstance().apply { set(2023, 0, 1) },
-            Calendar.getInstance()
+            BookStatus.Finished
         )
 
-        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book)
+        val predictedReadingTime = bookStatsService.getBookPredictedReadingTime(book)
         assertEquals(null, predictedReadingTime)
     }
 
@@ -97,12 +89,10 @@ class BookStatsTests {
             "Author name",
             100,
             0f,
-            BookStatus.Reading,
-            Calendar.getInstance().apply { set(2023, 0, 1) },
-            Calendar.getInstance()
+            BookStatus.Reading
         )
 
-        val predictedReadingTime = BookStatsDBService.getBookPredictedReadingTime(book)
+        val predictedReadingTime = bookStatsService.getBookPredictedReadingTime(book)
         assertEquals(null, predictedReadingTime)
     }
 }

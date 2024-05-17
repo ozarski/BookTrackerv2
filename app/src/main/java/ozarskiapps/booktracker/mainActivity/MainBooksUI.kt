@@ -1,9 +1,11 @@
 package ozarskiapps.booktracker.mainActivity
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
@@ -14,6 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import ozarskiapps.booktracker.addActivity.AddActivity
 import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.database.BookDBService
@@ -28,7 +33,7 @@ class MainBooksUI(val context: Context) {
     private lateinit var bookList: SnapshotStateList<List<Book>>
 
     @Composable
-    fun GenerateLayout(){
+    fun GenerateLayout() {
         LayoutMainBooks()
     }
 
@@ -57,13 +62,15 @@ class MainBooksUI(val context: Context) {
             val bookIDs = TagDBService(context).getBooksForTagIDs(listOf(it.id))
         }
 
+        val coroutineScope = rememberCoroutineScope()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
         ) {
+            AddButton(coroutineScope)
             TagDropdownTextRow(isOpen)
-
             Row(modifier = Modifier.fillMaxWidth()) {
                 DropdownTagList(
                     list = tagList,
@@ -88,6 +95,25 @@ class MainBooksUI(val context: Context) {
                 fontSize = 20.sp,
                 textAlign = TextAlign.Start
             )
+        }
+    }
+
+    @Composable
+    fun AddButton(coroutineScope: CoroutineScope) {
+        Row(){
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 5.dp, start = 10.dp),
+                onClick = {
+                    coroutineScope.launch {
+                        val intent = Intent(context, AddActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                }
+            ) {
+                Text(text = "Add")
+            }
         }
     }
 
@@ -118,15 +144,14 @@ class MainBooksUI(val context: Context) {
         }
     }
 
-    private fun reloadBookList(tag: Tag){
-        if(tag.name != "Reading" && tag.name != "Finished" && tag.name != "WantToRead" && tag.name != "All"){
+    private fun reloadBookList(tag: Tag) {
+        if (tag.name != "Reading" && tag.name != "Finished" && tag.name != "WantToRead" && tag.name != "All") {
             val bookIDs = TagDBService(context).getBooksForTagIDs(listOf(tag.id))
             val newBookList = BookDBService(context).getBooksWithIDs(bookIDs)
             bookList.clear()
             bookList.addAll(Collections.singleton(newBookList))
-        }
-        else{
-            if(tag.name == "All"){
+        } else {
+            if (tag.name == "All") {
                 bookList.clear()
                 bookList.addAll(Collections.singleton(BookDBService(context).getAllBooks()))
                 return

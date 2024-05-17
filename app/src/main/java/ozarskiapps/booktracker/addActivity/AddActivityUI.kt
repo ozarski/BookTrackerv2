@@ -2,6 +2,7 @@ package ozarskiapps.booktracker.addActivity
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -20,6 +21,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+import ozarskiapps.booktracker.book.Book
+import ozarskiapps.booktracker.book.BookStatus
+import ozarskiapps.booktracker.bookDetailsActivity.BookDetailsActivity
+import ozarskiapps.booktracker.database.BookDBService
+import ozarskiapps.booktracker.mainActivity.MainActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -254,10 +261,28 @@ class AddActivityUI(val context: Context) {
 
     @Composable
     fun AddButton(context: Context) {
+        val coroutineScope = rememberCoroutineScope()
         Button(
             onClick = {
                 if (!checkFields()) {
                     Toast.makeText(context, "Invalid values", Toast.LENGTH_SHORT).show()
+                }
+                else{
+                    val book = Book(
+                        title = title.value.text,
+                        author = author.value.text,
+                        numberOfPages = numberOfPages.value.text.toInt(),
+                        currentProgress = 0f,
+                        bookStatus = BookStatus.valueOf(selectedOption.value),
+                        startDate = startDate.value,
+                        endDate = endDate.value,
+                    )
+                    coroutineScope.launch {
+                        val bookID = BookDBService(context).addBook(book)
+                        val intent = Intent(context, BookDetailsActivity::class.java)
+                        intent.putExtra("BOOK_ID", bookID)
+                        context.startActivity(intent)
+                    }
                 }
             },
             modifier = Modifier

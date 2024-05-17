@@ -24,10 +24,10 @@ class BookDBService(private val context: Context) : DBService(context) {
             put(DatabaseConstants.BookTable.END_DATE_COLUMN, book.endDate.timeInMillis)
         }
 
-        val id = db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues)
-        book.id = id
-        ReadingTimeDBService(context).addBookReadingTime(book)
-        return id
+        return db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues).also {
+            book.id = it
+            ReadingTimeDBService(context).addBookReadingTime(book)
+        }
     }
 
     fun getBookByID(id: Long): Book? {
@@ -48,7 +48,7 @@ class BookDBService(private val context: Context) : DBService(context) {
 
         val selectionArgs = arrayOf(id.toString())
 
-        val cursor = db.query(
+        db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
             selection,
@@ -56,11 +56,9 @@ class BookDBService(private val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-
-        with(cursor) {
+        ).run {
             if (moveToFirst()) {
-                return getBookFromCursor(cursor)
+                return getBookFromCursor(this)
             }
         }
         return null
@@ -112,7 +110,8 @@ class BookDBService(private val context: Context) : DBService(context) {
         val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
         val selectionArgs = arrayOf(BookStatus.WantToRead.toString())
 
-        val cursor = db.query(
+        val bookList = mutableListOf<Book>()
+        db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
             selection,
@@ -120,17 +119,16 @@ class BookDBService(private val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-
-        val bookList = mutableListOf<Book>()
-        while (cursor.moveToNext()) {
-            bookList.add(getBookFromCursor(cursor))
+        ).run {
+            while (moveToNext()) {
+                bookList.add(getBookFromCursor(this))
+            }
         }
         return bookList
     }
 
     fun startReadingBookToday(book: Book) {
-        if(book.bookStatus == BookStatus.WantToRead){
+        if (book.bookStatus == BookStatus.WantToRead) {
             book.bookStatus = BookStatus.Reading
             book.startDate = Calendar.getInstance()
             updateBook(book)
@@ -138,61 +136,57 @@ class BookDBService(private val context: Context) : DBService(context) {
     }
 
     fun finishReadingBookToday(book: Book) {
-        if(book.bookStatus == BookStatus.Reading){
-            book.bookStatus = BookStatus.Finished
-            book.endDate = Calendar.getInstance()
-            updateBook(book)
-        }
-        else if(book.bookStatus == BookStatus.WantToRead){
-            book.bookStatus = BookStatus.Finished
-            book.startDate = Calendar.getInstance()
-            book.endDate = Calendar.getInstance()
-            updateBook(book)
-        }
+        if(book.bookStatus == BookStatus.Finished) return
+        book.startDate =
+            if (book.bookStatus == BookStatus.WantToRead) Calendar.getInstance() else book.startDate
+        book.endDate = Calendar.getInstance()
+        book.bookStatus = BookStatus.Finished
+        updateBook(book)
     }
 
-    private fun getBookFromCursor(cursor: Cursor): Book{
+    private fun getBookFromCursor(cursor: Cursor): Book {
+        with(cursor){
+            val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
+            val title =
+                getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
+            val author =
+                getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
+            val numberOfPages =
+                getInt(getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
+            val currentProgress =
+                getFloat(getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+            val bookStatus =
+                BookStatus.valueOf(
+                    getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN))
+                )
 
-        val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-        val title =
-            cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
-        val author =
-            cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
-        val numberOfPages =
-            cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
-        val currentProgress =
-            cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
-        val bookStatus =
-            BookStatus.valueOf(
-                cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN))
+            val startDate = calendarFromMillis(
+                getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
             )
-
-        val startDate = calendarFromMillis(
-            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
-        )
-        val endDate = calendarFromMillis(
-            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
-        )
-        return Book(
-            title,
-            author,
-            numberOfPages,
-            currentProgress,
-            bookStatus,
-            startDate,
-            endDate,
-            id
-        )
+            val endDate = calendarFromMillis(
+                getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
+            )
+            return Book(
+                title,
+                author,
+                numberOfPages,
+                currentProgress,
+                bookStatus,
+                startDate,
+                endDate,
+                id
+            )
+        }
     }
 
-    fun updateBookProgress(book: Book, progress: Float){
-        if(book.bookStatus == BookStatus.Reading){
+    fun updateBookProgress(book: Book, progress: Float) {
+        if (book.bookStatus == BookStatus.Reading) {
             book.currentProgress = progress
             updateBook(book)
         }
     }
 
-    fun getAllBooks(): List<Book>{
+    fun getAllBooks(): List<Book> {
         val db = this.readableDatabase
         val projection = arrayOf(
             DatabaseConstants.BookTable.TITLE_COLUMN,
@@ -205,7 +199,8 @@ class BookDBService(private val context: Context) : DBService(context) {
             BaseColumns._ID
         )
 
-        val cursor = db.query(
+        val bookList = mutableListOf<Book>()
+        db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
             null,
@@ -213,16 +208,15 @@ class BookDBService(private val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-
-        val bookList = mutableListOf<Book>()
-        while (cursor.moveToNext()) {
-            bookList.add(getBookFromCursor(cursor))
+        ).run{
+            while (moveToNext()) {
+                bookList.add(getBookFromCursor(this))
+            }
         }
         return bookList
     }
 
-    fun getBooksWithIDs(ids: List<Long>): List<Book>{
+    fun getBooksWithIDs(ids: List<Long>): List<Book> {
         val db = this.readableDatabase
         val projection = arrayOf(
             DatabaseConstants.BookTable.TITLE_COLUMN,
@@ -235,7 +229,8 @@ class BookDBService(private val context: Context) : DBService(context) {
             BaseColumns._ID
         )
         val selection = "${BaseColumns._ID} IN (${ids.joinToString(",")})"
-        val cursor = db.query(
+        val bookList = mutableListOf<Book>()
+        db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
             selection,
@@ -243,10 +238,10 @@ class BookDBService(private val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        val bookList = mutableListOf<Book>()
-        while(cursor.moveToNext()){
-            bookList.add(getBookFromCursor(cursor))
+        ).run{
+            while (moveToNext()) {
+                bookList.add(getBookFromCursor(this))
+            }
         }
         return bookList
     }

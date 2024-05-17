@@ -58,7 +58,6 @@ class MainUI(val context: Context) {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     private fun MainTabs(tabIndex: MutableState<Int>, scope: CoroutineScope, pagerState: PagerState) {
-
         tabs.forEachIndexed { index, title ->
             Tab(text = { Text(title) },
                 selected = tabIndex.value == index,

@@ -20,10 +20,10 @@ class OpenLibraryAPIBook(
     }
 
     fun authorsToString(): String{
-        var authorString = ""
-        authorName.forEach {
-            authorString+=it
+        return "".apply{
+            authorName.forEach {
+                this.plus(it)
+            }
         }
-        return authorString
     }
 }

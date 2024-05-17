@@ -10,8 +10,8 @@ class Book(
     var numberOfPages: Int,
     var currentProgress: Float,
     var bookStatus: BookStatus,
-    var startDate: Calendar,
-    var endDate: Calendar,
+    var startDate: Calendar = Calendar.getInstance(),
+    var endDate: Calendar = Calendar.getInstance(),
     var id: Long = -1
 ) {
     constructor(
@@ -83,7 +83,16 @@ class Book(
             } else {
                 -1.0
             }
-        } else {
+        }
+        else if (bookStatus == BookStatus.Reading){
+            val daysSinceStart = getDaysSinceStart()
+            if (daysSinceStart > 0) {
+                currentProgress.toDouble() / daysSinceStart
+            } else {
+                -1.0
+            }
+        }
+        else {
             -1.0
         }
     }

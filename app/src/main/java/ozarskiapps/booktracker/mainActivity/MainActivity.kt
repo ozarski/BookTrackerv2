@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         DBService(this).dropDatabase()
-        MockData(this).generateMockData()
+        //MockData(this).generateMockData()
 
         setContent {
             MainUI(this).GenerateLayout()
