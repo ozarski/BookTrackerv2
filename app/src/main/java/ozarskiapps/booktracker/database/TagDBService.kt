@@ -51,7 +51,7 @@ class TagDBService(val context: Context) : DBService(context) {
         )
         val selection = "${BaseColumns._ID} = ?"
         val selectionArgs = arrayOf(id.toString())
-        val cursor = db.query(
+        db.query(
             DatabaseConstants.TagTable.TABLE_NAME,
             projection,
             selection,
@@ -59,11 +59,11 @@ class TagDBService(val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        if (cursor.moveToFirst()) {
-            return getTagFromCursor(cursor)
+        ).run{
+            if(moveToFirst()){
+                return getTagFromCursor(this)
+            }
         }
-        cursor.close()
         return null
     }
 
@@ -77,27 +77,27 @@ class TagDBService(val context: Context) : DBService(context) {
     }
 
     fun removeBookTagItems(tagID: Long? = null, bookID: Long? = null) {
-        val db = this.writableDatabase
         if(tagID == null && bookID == null) {
             return
         }
-        if(tagID == null) {
-            val selection = "${DatabaseConstants.BookTagTable.BOOK_ID_COLUMN} = ?"
-            val selectionArgs = arrayOf(bookID.toString())
-            db.delete(DatabaseConstants.BookTagTable.TABLE_NAME, selection, selectionArgs)
-            return
-        }
-        if(bookID == null){
-            val selection =
-                "${DatabaseConstants.BookTagTable.TAG_ID_COLUMN} = ?"
-            val selectionArgs = arrayOf(tagID.toString())
-            db.delete(DatabaseConstants.BookTagTable.TABLE_NAME, selection, selectionArgs)
-            return
-        }
-        val selection =
+
+        val selection = if(tagID == null) {
+            "${DatabaseConstants.BookTagTable.BOOK_ID_COLUMN} = ?"
+        } else if (bookID == null) {
+            "${DatabaseConstants.BookTagTable.TAG_ID_COLUMN} = ?"
+        } else {
             "${DatabaseConstants.BookTagTable.TAG_ID_COLUMN} = ? AND ${DatabaseConstants.BookTagTable.BOOK_ID_COLUMN} = ?"
-        val selectionArgs = arrayOf(tagID.toString(), bookID.toString())
-        db.delete(DatabaseConstants.BookTagTable.TABLE_NAME, selection, selectionArgs)
+        }
+
+        val selectionArgs = if(tagID == null) {
+            arrayOf(bookID.toString())
+        } else if (bookID == null) {
+            arrayOf(tagID.toString())
+        } else {
+            arrayOf(tagID.toString(), bookID.toString())
+        }
+
+        this.writableDatabase.delete(DatabaseConstants.BookTagTable.TABLE_NAME, selection, selectionArgs)
     }
 
     fun getAllTags(): List<Tag> {
@@ -107,7 +107,9 @@ class TagDBService(val context: Context) : DBService(context) {
             DatabaseConstants.TagTable.TAG_NAME_COLUMN,
             DatabaseConstants.TagTable.TAG_COLOR_COLUMN
         )
-        val cursor = db.query(
+
+        val tags = mutableListOf<Tag>()
+        db.query(
             DatabaseConstants.TagTable.TABLE_NAME,
             projection,
             null,
@@ -115,22 +117,23 @@ class TagDBService(val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        val tags = mutableListOf<Tag>()
-        while (cursor.moveToNext()) {
-            val tag = getTagFromCursor(cursor)
-            tags.add(tag)
+        ).run{
+            while (moveToNext()) {
+                val tag = getTagFromCursor(this)
+                tags.add(tag)
+            }
         }
-        cursor.close()
+
         return tags
     }
 
     fun getNumberOfBooksUnderTag(tagID: Long): Int {
         val db = this.readableDatabase
-        val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN)
+        val resultColumn = "numberOfBooks"
+        val projection = arrayOf("COUNT(DISTINCT ${DatabaseConstants.BookTagTable.BOOK_ID_COLUMN}) as $resultColumn")
         val selection = "${DatabaseConstants.BookTagTable.TAG_ID_COLUMN} = ?"
         val selectionArgs = arrayOf(tagID.toString())
-        val cursor = db.query(
+        db.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
             selection,
@@ -138,10 +141,14 @@ class TagDBService(val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        val numberOfBooks = cursor.count
-        cursor.close()
-        return numberOfBooks
+        ).run{
+            if(moveToFirst()){
+                return getInt(getColumnIndexOrThrow(resultColumn)).also {
+                    close()
+                }
+            }
+        }
+        return 0
     }
 
     fun getBooksForTagIDs(tagIDs: List<Long>): List<Long> {
@@ -149,7 +156,9 @@ class TagDBService(val context: Context) : DBService(context) {
         val projection = arrayOf(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN)
         val tagIDsString = tagIDs.joinToString()
         val selection = "${DatabaseConstants.BookTagTable.TAG_ID_COLUMN} IN ($tagIDsString)"
-        val cursor = db.query(
+
+        val bookIDs = mutableListOf<Long>()
+        db.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
             selection,
@@ -157,18 +166,19 @@ class TagDBService(val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        val bookIDs = mutableListOf<Long>()
-        while (cursor.moveToNext()) {
-            bookIDs.add(cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN)))
+        ).run{
+            while (moveToNext()) {
+                bookIDs.add(getLong(getColumnIndexOrThrow(DatabaseConstants.BookTagTable.BOOK_ID_COLUMN)))
+            }
+            close()
         }
-        cursor.close()
         //check if all tagIDs are present for each bookID
-        val distinctBookIDs = bookIDs.distinct()
-        if(distinctBookIDs.size * tagIDs.size == bookIDs.size) {
-            return distinctBookIDs
+        return bookIDs.distinct().let{
+            if(it.size * tagIDs.size != bookIDs.size) {
+                return emptyList()
+            }
+            it
         }
-        return emptyList()
     }
 
     fun getTagsForBookID(id: Long): List<Tag>{
@@ -178,7 +188,9 @@ class TagDBService(val context: Context) : DBService(context) {
         )
         val selection = "${DatabaseConstants.BookTagTable.BOOK_ID_COLUMN} = ?"
         val selectionArgs = arrayOf(id.toString())
-        val cursor = db.query(
+
+        val tags = mutableListOf<Tag>()
+        db.query(
             DatabaseConstants.BookTagTable.TABLE_NAME,
             projection,
             selection,
@@ -186,14 +198,14 @@ class TagDBService(val context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        val tags = mutableListOf<Tag>()
-        while (cursor.moveToNext()) {
-            val tagID = cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTagTable.TAG_ID_COLUMN))
-            val tag = getTagByID(tagID) ?: continue
-            tags.add(tag)
+        ).run{
+            while (moveToNext()) {
+                val tagID = getLong(getColumnIndexOrThrow(DatabaseConstants.BookTagTable.TAG_ID_COLUMN))
+                val tag = getTagByID(tagID) ?: continue
+                tags.add(tag)
+            }
+            close()
         }
-        cursor.close()
         return tags
     }
 

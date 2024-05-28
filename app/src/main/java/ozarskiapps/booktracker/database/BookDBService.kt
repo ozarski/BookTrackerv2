@@ -11,6 +11,17 @@ import java.util.*
 
 class BookDBService(private val context: Context) : DBService(context) {
 
+    val fullBookProjection = arrayOf(
+        BaseColumns._ID,
+        DatabaseConstants.BookTable.TITLE_COLUMN,
+        DatabaseConstants.BookTable.AUTHOR_COLUMN,
+        DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
+        DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
+        DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
+        DatabaseConstants.BookTable.START_DATE_COLUMN,
+        DatabaseConstants.BookTable.END_DATE_COLUMN
+    )
+
     fun addBook(book: Book): Long {
         val db = this.writableDatabase
 
@@ -33,24 +44,13 @@ class BookDBService(private val context: Context) : DBService(context) {
     fun getBookByID(id: Long): Book? {
         val db = this.readableDatabase
 
-        val projection = arrayOf(
-            DatabaseConstants.BookTable.TITLE_COLUMN,
-            DatabaseConstants.BookTable.AUTHOR_COLUMN,
-            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
-            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
-            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
-            DatabaseConstants.BookTable.START_DATE_COLUMN,
-            DatabaseConstants.BookTable.END_DATE_COLUMN,
-            BaseColumns._ID
-        )
-
         val selection = "${BaseColumns._ID} = ?"
 
         val selectionArgs = arrayOf(id.toString())
 
         db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
-            projection,
+            fullBookProjection,
             selection,
             selectionArgs,
             null,
@@ -97,23 +97,13 @@ class BookDBService(private val context: Context) : DBService(context) {
 
     fun getAllWantToReadBooks(): List<Book> {
         val db = this.readableDatabase
-        val projection = arrayOf(
-            DatabaseConstants.BookTable.TITLE_COLUMN,
-            DatabaseConstants.BookTable.AUTHOR_COLUMN,
-            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
-            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
-            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
-            DatabaseConstants.BookTable.START_DATE_COLUMN,
-            DatabaseConstants.BookTable.END_DATE_COLUMN,
-            BaseColumns._ID
-        )
         val selection = "${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
         val selectionArgs = arrayOf(BookStatus.WantToRead.toString())
 
         val bookList = mutableListOf<Book>()
         db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
-            projection,
+            fullBookProjection,
             selection,
             selectionArgs,
             null,
@@ -188,21 +178,11 @@ class BookDBService(private val context: Context) : DBService(context) {
 
     fun getAllBooks(): List<Book> {
         val db = this.readableDatabase
-        val projection = arrayOf(
-            DatabaseConstants.BookTable.TITLE_COLUMN,
-            DatabaseConstants.BookTable.AUTHOR_COLUMN,
-            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
-            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
-            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
-            DatabaseConstants.BookTable.START_DATE_COLUMN,
-            DatabaseConstants.BookTable.END_DATE_COLUMN,
-            BaseColumns._ID
-        )
 
         val bookList = mutableListOf<Book>()
         db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
-            projection,
+            fullBookProjection,
             null,
             null,
             null,
@@ -218,21 +198,12 @@ class BookDBService(private val context: Context) : DBService(context) {
 
     fun getBooksWithIDs(ids: List<Long>): List<Book> {
         val db = this.readableDatabase
-        val projection = arrayOf(
-            DatabaseConstants.BookTable.TITLE_COLUMN,
-            DatabaseConstants.BookTable.AUTHOR_COLUMN,
-            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
-            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
-            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
-            DatabaseConstants.BookTable.START_DATE_COLUMN,
-            DatabaseConstants.BookTable.END_DATE_COLUMN,
-            BaseColumns._ID
-        )
+
         val selection = "${BaseColumns._ID} IN (${ids.joinToString(",")})"
         val bookList = mutableListOf<Book>()
         db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
-            projection,
+            fullBookProjection,
             selection,
             null,
             null,

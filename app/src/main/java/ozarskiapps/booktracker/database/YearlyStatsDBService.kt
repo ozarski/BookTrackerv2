@@ -44,7 +44,9 @@ class YearlyStatsDBService(
             endCal.timeInMillis.toString(),
             BookStatus.Finished.toString()
         )
-        val cursor = db.query(
+
+        val books = mutableListOf<Book>()
+        db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
             selection,
@@ -52,13 +54,13 @@ class YearlyStatsDBService(
             null,
             null,
             null
-        )
-
-        val books = mutableListOf<Book>()
-        while (cursor.moveToNext()) {
-            val book = getBookFromCursor(cursor)
-            books.add(book)
+        ).run {
+            while (moveToNext()) {
+                val book = getBookFromCursor(this)
+                books.add(book)
+            }
         }
+
         return books
     }
 
@@ -92,22 +94,22 @@ class YearlyStatsDBService(
         val startTime = getCalendarYearStart()
         val endTime = getCalendarYearEnd()
         val readingTime = readingTimeDBService.getTotalReadingTimeForTimePeriod(startTime, endTime)
+
         return if (readingTime == 0) 0.0
         else getTotalNumberOfPages() / readingTime.toDouble()
     }
 
     fun getAverageBooksPerMonth(): Double {
         if (getTotalNumberOfBooks() == 0) return 0.0
-
         return getTotalNumberOfBooks() / 12.0
     }
 
     fun getAverageBooksPerWeek(): Double {
         if (getTotalNumberOfBooks() == 0) return 0.0
-
         return getTotalNumberOfBooks() / 52.0
     }
 
+    //TODO("Doesn't make any sense, checks only current year, fix later")
     fun getMonthWithMostBooksRead(): String {
         if (getTotalNumberOfBooks() == 0) return "-"
         val calendar = Calendar.getInstance().apply { set(Calendar.MONTH, 0) }
@@ -127,10 +129,11 @@ class YearlyStatsDBService(
     }
 
     //timeNow is used only for testing, DO NOT PASS THIS PARAMETER IN PRODUCTION CODE
+    //TODO("Fix tests so that timeNow is not necessary")
     fun getYearProgress(timeNow: Calendar = Calendar.getInstance()): Double {
         val maxDays = timeNow.getActualMaximum(Calendar.DAY_OF_YEAR)
         val currentDay = timeNow.get(Calendar.DAY_OF_YEAR)
-        return currentDay.toDouble()/maxDays.toDouble()
+        return currentDay.toDouble() / maxDays.toDouble()
     }
 
     private fun getCalendarMonthStart(calendar: Calendar): Calendar {
@@ -156,31 +159,33 @@ class YearlyStatsDBService(
     }
 
     private fun getBookFromCursor(cursor: Cursor): Book {
-        val title =
-            cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
-        val author =
-            cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
-        val numberOfPages =
-            cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
-        val bookStatus =
-            BookStatus.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN)))
-        val currentProgress =
-            cursor.getFloat(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
-        val startDateMillis =
-            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
-        val endDateMillis =
-            cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
-        val id = cursor.getLong(cursor.getColumnIndexOrThrow(BaseColumns._ID))
-        return Book(
-            title,
-            author,
-            numberOfPages,
-            currentProgress,
-            bookStatus,
-            calendarFromMillis(startDateMillis),
-            calendarFromMillis(endDateMillis),
-            id
-        )
+        with(cursor){
+            val title =
+                getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
+            val author =
+                getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
+            val numberOfPages =
+                getInt(getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
+            val bookStatus =
+                BookStatus.valueOf(getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN)))
+            val currentProgress =
+                getFloat(getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
+            val startDateMillis =
+                getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
+            val endDateMillis =
+                getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
+            val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
+            return Book(
+                title,
+                author,
+                numberOfPages,
+                currentProgress,
+                bookStatus,
+                calendarFromMillis(startDateMillis),
+                calendarFromMillis(endDateMillis),
+                id
+            )
+        }
     }
 
     private fun getCalendarYearStart(): Calendar {
@@ -207,6 +212,7 @@ class YearlyStatsDBService(
         return cal
     }
 
+    //TODO("Method to be removed, use MonthlyStatsDBService instead")
     fun getNumberOfBooksForMonth(month: Calendar): Int {
         val start = getCalendarMonthStart(month)
         val end = getCalendarMonthEnd(month)

@@ -20,7 +20,8 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
         val selection = "${DatabaseConstants.ReadingTimeTable.DATE_COLUMN} BETWEEN ? AND ?"
         val selectionArgs =
             arrayOf(startCal.timeInMillis.toString(), endCal.timeInMillis.toString())
-        val cursor = db.query(
+
+        db.query(
             DatabaseConstants.ReadingTimeTable.TABLE_NAME,
             projection,
             selection,
@@ -28,10 +29,11 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        with(cursor) {
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(getColumnIndexOrThrow(resultColumn))
+        ).run {
+            if (moveToFirst()) {
+                return getInt(getColumnIndexOrThrow(resultColumn)).also {
+                    close()
+                }
             }
         }
         return 0
@@ -42,12 +44,15 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
         val startCal = setCalendar(start)
         val endCal = setCalendar(end, false)
         val resultColumn = "bookID"
-        val projection = arrayOf("DISTINCT ${DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN} as $resultColumn")
+        val projection =
+            arrayOf("DISTINCT ${DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN} as $resultColumn")
 
         val selection = "${DatabaseConstants.ReadingTimeTable.DATE_COLUMN} BETWEEN ? AND ?"
         val selectionArgs =
             arrayOf(startCal.timeInMillis.toString(), endCal.timeInMillis.toString())
-        val cursor = db.query(
+
+        val bookIds = mutableListOf<Long>()
+        db.query(
             DatabaseConstants.ReadingTimeTable.TABLE_NAME,
             projection,
             selection,
@@ -55,12 +60,11 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        val bookIds = mutableListOf<Long>()
-        with(cursor) {
+        ).run {
             while (moveToNext()) {
                 bookIds.add(getLong(getColumnIndexOrThrow(resultColumn)))
             }
+            close()
         }
         return bookIds
     }
@@ -68,12 +72,18 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
     fun addBookReadingTime(book: Book) {
         val days = getReadingDaysForBook(book)
         val db = this.writableDatabase
-        days.forEach {
-            val contentValues = ContentValues().apply {
-                put(DatabaseConstants.ReadingTimeTable.DATE_COLUMN, it.date.timeInMillis)
-                put(DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN, it.bookID)
+        db.beginTransaction()
+        try {
+            days.forEach {
+                val contentValues = ContentValues().apply {
+                    put(DatabaseConstants.ReadingTimeTable.DATE_COLUMN, it.date.timeInMillis)
+                    put(DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN, it.bookID)
+                }
+                db.insert(DatabaseConstants.ReadingTimeTable.TABLE_NAME, null, contentValues)
             }
-            db.insert(DatabaseConstants.ReadingTimeTable.TABLE_NAME, null, contentValues)
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
         }
     }
 
@@ -83,10 +93,13 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
     }
 
     fun deleteBookReadingTimeByBookID(id: Long) {
-        val db = this.writableDatabase
         val selection = "${DatabaseConstants.ReadingTimeTable.BOOK_ID_COLUMN} = ?"
         val selectionArgs = arrayOf(id.toString())
-        db.delete(DatabaseConstants.ReadingTimeTable.TABLE_NAME, selection, selectionArgs)
+        this.writableDatabase.delete(
+            DatabaseConstants.ReadingTimeTable.TABLE_NAME,
+            selection,
+            selectionArgs
+        )
     }
 
     fun getTotalReadingTime(): Int {
@@ -94,7 +107,8 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
         val resultColumn = "numberOfDays"
         val projection =
             arrayOf("COUNT(DISTINCT ${DatabaseConstants.ReadingTimeTable.DATE_COLUMN}) as $resultColumn")
-        val cursor = db.query(
+
+        db.query(
             DatabaseConstants.ReadingTimeTable.TABLE_NAME,
             projection,
             null,
@@ -102,12 +116,14 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        with(cursor) {
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(getColumnIndexOrThrow(resultColumn))
+        ).run {
+            if (moveToFirst()) {
+                return getInt(getColumnIndexOrThrow(resultColumn)).also {
+                    close()
+                }
             }
         }
+
         return 0
     }
 
@@ -122,7 +138,7 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
         val selectionArgs =
             arrayOf(startCal.timeInMillis.toString(), endCal.timeInMillis.toString())
 
-        val cursor = db.query(
+        db.query(
             DatabaseConstants.ReadingTimeTable.TABLE_NAME,
             projection,
             selection,
@@ -130,12 +146,14 @@ class ReadingTimeDBService(context: Context) : DBService(context) {
             null,
             null,
             null
-        )
-        with(cursor) {
-            if (cursor.moveToFirst()) {
-                return cursor.getInt(getColumnIndexOrThrow(resultColumn))
+        ).run{
+            if (moveToFirst()) {
+                return getInt(getColumnIndexOrThrow(resultColumn)).also{
+                    close()
+                }
             }
         }
+
         return 0
     }
 
