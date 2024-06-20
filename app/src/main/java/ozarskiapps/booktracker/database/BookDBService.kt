@@ -37,7 +37,9 @@ class BookDBService(private val context: Context) : DBService(context) {
 
         return db.insert(DatabaseConstants.BookTable.TABLE_NAME, null, contentValues).also {
             book.id = it
-            ReadingTimeDBService(context).addBookReadingTime(book)
+            if(book.bookStatus == BookStatus.Finished){
+                ReadingTimeDBService(context).addBookReadingTime(book)
+            }
         }
     }
 

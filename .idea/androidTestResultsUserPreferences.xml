@@ -33,6 +33,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-1594160313">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="realme RMX2155" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-1319167677">
           <value>
             <AndroidTestResultsTableState>
@@ -48,6 +61,19 @@
           </value>
         </entry>
         <entry key="-1234717415">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="realme RMX2155" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-883469022">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -147,6 +173,19 @@
           </value>
         </entry>
         <entry key="-262074939">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="realme RMX2155" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-206124072">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -263,6 +302,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Tests" value="360" />
                   <entry key="realme&#10; RMX2155" value="120" />
+                  <entry key="realme RMX2155" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

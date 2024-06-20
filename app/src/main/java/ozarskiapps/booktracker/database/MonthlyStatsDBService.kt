@@ -11,40 +11,30 @@ import java.util.*
 class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar.getInstance()) :
     DBService(context) {
 
-    private var books = getBooksForMonth(month)
 
     fun setMonth(month: Calendar) {
-        books = getBooksForMonth(month)
         this.month.timeInMillis = month.timeInMillis
     }
 
-    private fun getBooksForMonth(month: Calendar): List<Book> {
+    fun getTotalNumberOfBooks(): Int {
         val db = this.readableDatabase
+
+        val resultColumn = "totalBooks"
+
         val projection = arrayOf(
-            BaseColumns._ID,
-            DatabaseConstants.BookTable.TITLE_COLUMN,
-            DatabaseConstants.BookTable.AUTHOR_COLUMN,
-            DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN,
-            DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN,
-            DatabaseConstants.BookTable.BOOK_STATUS_COLUMN,
-            DatabaseConstants.BookTable.START_DATE_COLUMN,
-            DatabaseConstants.BookTable.END_DATE_COLUMN,
+            "COUNT(*) as $resultColumn"
         )
 
-        val (monthStart, monthEnd) = getCalendarStartEnd(month)
-
-        val selection =
-            "${DatabaseConstants.BookTable.END_DATE_COLUMN} >= ? " +
-                    "AND ${DatabaseConstants.BookTable.END_DATE_COLUMN} <= ? " +
-                    "AND ${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selection = "${DatabaseConstants.BookTable.END_DATE_COLUMN} >= ? " +
+                "AND ${DatabaseConstants.BookTable.END_DATE_COLUMN} <= ? " +
+                "AND ${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
         val selectionArgs = arrayOf(
-            monthStart.timeInMillis.toString(),
-            monthEnd.timeInMillis.toString(),
+            getCalendarMonthStart(month).timeInMillis.toString(),
+            getCalendarMonthEnd(month).timeInMillis.toString(),
             BookStatus.Finished.toString()
         )
 
-        val booksForMonth = mutableListOf<Book>()
-        db.query(
+        return db.query(
             DatabaseConstants.BookTable.TABLE_NAME,
             projection,
             selection,
@@ -52,28 +42,57 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
             null,
             null,
             null
-        ).apply{
-            while (moveToNext()) {
-                val book = getBookFromCursor(this)
-                booksForMonth.add(book)
+        ).run {
+            if (moveToFirst()) {
+                getInt(getColumnIndexOrThrow(resultColumn)).also{
+                    close()
+                }
+            } else {
+                0
             }
         }
-        return booksForMonth
-
-    }
-
-    fun getTotalNumberOfBooks(): Int {
-        return books.size
     }
 
     fun getTotalNumberOfPages(): Long {
-        if (getTotalNumberOfBooks() == 0) return 0
-        return books.sumOf { it.numberOfPages }.toLong()
+        val db = this.readableDatabase
+
+        val resultColumn = "totalPages"
+        val projection = arrayOf(
+            "SUM(${DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN}) as $resultColumn"
+        )
+
+        val selection = "${DatabaseConstants.BookTable.END_DATE_COLUMN} >= ? " +
+                "AND ${DatabaseConstants.BookTable.END_DATE_COLUMN} <= ? " +
+                "AND ${DatabaseConstants.BookTable.BOOK_STATUS_COLUMN} = ?"
+        val selectionArgs = arrayOf(
+            getCalendarMonthStart(month).timeInMillis.toString(),
+            getCalendarMonthEnd(month).timeInMillis.toString(),
+            BookStatus.Finished.toString()
+        )
+
+        return db.query(
+            DatabaseConstants.BookTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        ).run {
+            if (moveToFirst()) {
+                getLong(getColumnIndexOrThrow(resultColumn)).also{
+                    close()
+                }
+            } else {
+                0
+            }
+        }
     }
 
     fun getAverageNumberOfPagesPerBook(): Double {
-        if (getTotalNumberOfBooks() == 0) return 0.0
-        return getTotalNumberOfPages().toDouble() / getTotalNumberOfBooks()
+        val totalNumberOfBooks = getTotalNumberOfBooks()
+        if (totalNumberOfBooks == 0) return 0.0
+        return getTotalNumberOfPages().toDouble() / totalNumberOfBooks
     }
 
     fun getAverageReadingTime(): Double {
@@ -112,37 +131,6 @@ class MonthlyStatsDBService(val context: Context, val month: Calendar = Calendar
         val maxDays = timeNow.getActualMaximum(Calendar.DAY_OF_MONTH)
         val currentDay = timeNow.get(Calendar.DAY_OF_MONTH)
         return currentDay.toDouble()/maxDays.toDouble()
-    }
-
-    private fun getBookFromCursor(cursor: Cursor): Book {
-        with(cursor){
-            val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
-            val title =
-                getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.TITLE_COLUMN))
-            val author =
-                getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN))
-            val numberOfPages =
-                getInt(getColumnIndexOrThrow(DatabaseConstants.BookTable.NUMBER_OF_PAGES_COLUMN))
-            val currentProgress =
-                getFloat(getColumnIndexOrThrow(DatabaseConstants.BookTable.CURRENT_PROGRESS_COLUMN))
-            val bookStatus =
-                BookStatus.valueOf(getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.BOOK_STATUS_COLUMN)))
-            val startDateMillis =
-                getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.START_DATE_COLUMN))
-            val endDateMillis =
-                getLong(getColumnIndexOrThrow(DatabaseConstants.BookTable.END_DATE_COLUMN))
-
-            return Book(
-                title,
-                author,
-                numberOfPages,
-                currentProgress,
-                bookStatus,
-                calendarFromMillis(startDateMillis),
-                calendarFromMillis(endDateMillis),
-                id
-            )
-        }
     }
 
     private fun getCalendarMonthStart(calendar: Calendar): Calendar {

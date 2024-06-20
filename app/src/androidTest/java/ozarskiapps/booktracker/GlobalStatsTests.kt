@@ -154,10 +154,10 @@ class GlobalStatsTests {
 
     @Test
     fun numberOfMonthsBetweenDatesTest(){
-        val start = Calendar.getInstance().apply { set(Calendar.MONTH, get(Calendar.MONTH) - 11) }
-        val end = Calendar.getInstance()
+        val start = Calendar.getInstance().apply { set(Calendar.YEAR, 2023); set(Calendar.MONTH, 0) }
+        val end = Calendar.getInstance().apply{ set(Calendar.YEAR, 2024); set(Calendar.MONTH, 0)}
         val result = globalStatsService.getNumberOfMonthsBetweenDates(start, end)
-        assertEquals(12, result)
+        assertEquals(13, result)
     }
 
     @Test

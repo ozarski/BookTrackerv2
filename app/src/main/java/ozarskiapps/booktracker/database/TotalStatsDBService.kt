@@ -237,7 +237,7 @@ class TotalStatsDBService(val context: Context) : DBService(context) {
             orderBy
         ).run {
             if (moveToFirst()) {
-                return getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN)).also{
+                return getString(getColumnIndexOrThrow(DatabaseConstants.BookTable.AUTHOR_COLUMN)).also {
                     close()
                 }
             }
@@ -246,14 +246,8 @@ class TotalStatsDBService(val context: Context) : DBService(context) {
     }
 
     fun getNumberOfMonthsBetweenDates(start: Calendar, end: Calendar): Int {
-        var numberOfMonths = 0
-        val iteratorDate = start.clone() as Calendar
-        while (iteratorDate.before(end)) {
-            numberOfMonths++
-            iteratorDate.add(Calendar.MONTH, 1)
-        }
-        numberOfMonths++
-        return numberOfMonths
+        return ((end.get(Calendar.YEAR) - start.get(Calendar.YEAR)) * 12
+        + end.get(Calendar.MONTH) - start.get(Calendar.MONTH) + 1)
     }
 
     fun getNumberOfWeeksBetweenDates(start: Calendar, end: Calendar): Int {

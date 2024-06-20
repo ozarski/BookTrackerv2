@@ -10,6 +10,7 @@ import ozarskiapps.booktracker.book.Book
 import ozarskiapps.booktracker.book.BookStatus
 import ozarskiapps.booktracker.database.BookDBService
 import ozarskiapps.booktracker.database.DatabaseConstants
+import ozarskiapps.booktracker.database.MonthlyStatsDBService
 import ozarskiapps.booktracker.database.YearlyStatsDBService
 import java.util.*
 
@@ -43,7 +44,7 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getTotalNumberOfPagesNoBooksInTheDatabase(){
+    fun getTotalNumberOfPagesNoBooksInTheDatabase() {
         val totalNumberOfPages = yearlyStatsService.getTotalNumberOfPages()
         assertEquals(0, totalNumberOfPages)
     }
@@ -57,7 +58,7 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getTotalBooksNoBooksInTheDatabase(){
+    fun getTotalBooksNoBooksInTheDatabase() {
         val totalNumberOfBooks = yearlyStatsService.getTotalNumberOfBooks()
         assertEquals(0, totalNumberOfBooks)
     }
@@ -71,7 +72,7 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getAverageNumberOfPagesPerBookNoBooksInTheDatabase(){
+    fun getAverageNumberOfPagesPerBookNoBooksInTheDatabase() {
         val averageNumberOfPagesPerBook = yearlyStatsService.getAverageNumberOfPagesPerBook()
         assertEquals(0.0, averageNumberOfPagesPerBook)
     }
@@ -85,7 +86,7 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getAverageReadingTimeNoBooksInTheDatabase(){
+    fun getAverageReadingTimeNoBooksInTheDatabase() {
         val averageReadingTime = yearlyStatsService.getAverageReadingTime()
         assertEquals(0.0, averageReadingTime, 0.01)
     }
@@ -95,18 +96,17 @@ class YearlyStatsTests {
         addBooks()
         yearlyStatsService.setYear(Calendar.getInstance())
         val averageNumberOfPagesPerDay = yearlyStatsService.getAveragePagesPerDay()
-        assertEquals(350.0, averageNumberOfPagesPerDay, 0.01)
+        assertEquals(233.33, averageNumberOfPagesPerDay, 0.01)
     }
 
     @Test
-    fun getAverageNumberOfPagesPerDayNoBooksInTheDatabase(){
+    fun getAverageNumberOfPagesPerDayNoBooksInTheDatabase() {
         val averageNumberOfPagesPerDay = yearlyStatsService.getAveragePagesPerDay()
         assertEquals(0.0, averageNumberOfPagesPerDay)
     }
 
     @Test
-    fun getAverageBooksPerMonth()
-    {
+    fun getAverageBooksPerMonth() {
         addBooks()
         yearlyStatsService.setYear(Calendar.getInstance())
         val averageBooksPerMonth = yearlyStatsService.getAverageBooksPerMonth()
@@ -114,13 +114,13 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getAverageBooksPerMonthNoBooksInTheDatabase(){
+    fun getAverageBooksPerMonthNoBooksInTheDatabase() {
         val averageBooksPerMonth = yearlyStatsService.getAverageBooksPerMonth()
         assertEquals(0.0, averageBooksPerMonth)
     }
 
     @Test
-    fun getAverageBooksPerWeek(){
+    fun getAverageBooksPerWeek() {
         addBooks()
         yearlyStatsService.setYear(Calendar.getInstance())
         val averageBooksPerWeek = yearlyStatsService.getAverageBooksPerWeek()
@@ -129,13 +129,13 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getAverageBooksPerWeekNoBooksInTheDatabase(){
+    fun getAverageBooksPerWeekNoBooksInTheDatabase() {
         val averageBooksPerWeek = yearlyStatsService.getAverageBooksPerWeek()
         assertEquals(0.0, averageBooksPerWeek)
     }
 
     @Test
-    fun getMonthWithMostBooksRead(){
+    fun getMonthWithMostBooksRead() {
         addBooks()
         yearlyStatsService.setYear(Calendar.getInstance())
         val monthWithMostBooksRead = yearlyStatsService.getMonthWithMostBooksRead()
@@ -143,31 +143,39 @@ class YearlyStatsTests {
     }
 
     @Test
-    fun getMonthWithMostBooksReadNoBooksInTheDatabase(){
+    fun getMonthWithMostBooksReadNoBooksInTheDatabase() {
         val monthWithMostBooksRead = yearlyStatsService.getMonthWithMostBooksRead()
         assertEquals("-", monthWithMostBooksRead)
     }
 
     @Test
-    fun getNumberOfBooksForMonth(){
+    fun getNumberOfBooksForMonth() {
         addBooks()
         yearlyStatsService.setYear(Calendar.getInstance())
-        val numberOfBooksForMonth = yearlyStatsService.getNumberOfBooksForMonth(
-            Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 1)}
-        )
+        val monthlyStatsService = MonthlyStatsDBService(
+            appContext,
+            Calendar.getInstance().apply { set(Calendar.MONTH, 1); set(Calendar.DAY_OF_MONTH, 1)})
+        val numberOfBooksForMonth = monthlyStatsService.getTotalNumberOfBooks()
         assertEquals(2, numberOfBooksForMonth)
     }
 
     @Test
-    fun getYearProgress(){
-        val timeNow = Calendar.getInstance().apply {
-            set(Calendar.DAY_OF_YEAR, 5)
-            set(Calendar.YEAR, 2023)
-        }
+    fun getYearProgressYearEnded() {
+        yearlyStatsService.setYear(Calendar.getInstance().apply { set(Calendar.YEAR, 2023) })
 
-        val yearProgress = yearlyStatsService.getYearProgress(timeNow)
-        assertEquals(0.013, yearProgress, 0.001)
+        val yearProgress = yearlyStatsService.getYearProgress()
+        assertEquals(100.0, yearProgress, 0.001)
+    }
+
+    @Test
+    fun getYearProgressCurrentProgress() {
+        val (yearDay, maxDays) = Calendar.getInstance()
+            .run { Pair(get(Calendar.DAY_OF_YEAR), getActualMaximum(Calendar.DAY_OF_YEAR)) }
+
+        val expectedProgress = yearDay.toDouble() / maxDays.toDouble()
+        val yearProgress = yearlyStatsService.getYearProgress()
+
+        assertEquals(expectedProgress, yearProgress, 0.001)
     }
 
 
@@ -179,9 +187,15 @@ class YearlyStatsTests {
             0f,
             BookStatus.Finished,
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 1)},
+                .apply {
+                    set(Calendar.MONTH, 1)
+                    set(Calendar.DAY_OF_MONTH, 2)
+                },
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 1)}
+                .apply {
+                    set(Calendar.MONTH, 1)
+                    set(Calendar.DAY_OF_MONTH, 2)
+                }
         )
 
         val book2 = Book(
@@ -191,9 +205,15 @@ class YearlyStatsTests {
             0f,
             BookStatus.Finished,
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 1)},
+                .apply {
+                    set(Calendar.MONTH, 1)
+                    set(Calendar.DAY_OF_MONTH, 1)
+                },
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 1)}
+                .apply {
+                    set(Calendar.MONTH, 1)
+                    set(Calendar.DAY_OF_MONTH, 1)
+                }
         )
 
         val book3 = Book(
@@ -203,9 +223,9 @@ class YearlyStatsTests {
             0f,
             BookStatus.Finished,
             Calendar.getInstance()
-                .apply { set(Calendar.YEAR, get(Calendar.YEAR) - 1) },
+                .apply { add(Calendar.YEAR, -1) },
             Calendar.getInstance()
-                .apply { set(Calendar.YEAR, get(Calendar.YEAR) - 1) }
+                .apply { add(Calendar.YEAR, -1) }
         )
 
         val book4 = Book(
@@ -215,9 +235,15 @@ class YearlyStatsTests {
             0f,
             BookStatus.Finished,
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 0)},
+                .apply {
+                    set(Calendar.MONTH, 0)
+                    set(Calendar.DAY_OF_MONTH, 1)
+                },
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 0)}
+                .apply {
+                    set(Calendar.MONTH, 0)
+                    set(Calendar.DAY_OF_MONTH, 1)
+                }
         )
 
         val book5 = Book(
@@ -227,9 +253,7 @@ class YearlyStatsTests {
             0f,
             BookStatus.Reading,
             Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 0)},
-            Calendar.getInstance()
-                .apply { set(Calendar.MONTH, 0)}
+                .apply { set(Calendar.MONTH, 0) },
         )
 
         bookDBService.addBook(book1)
